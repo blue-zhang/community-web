@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 利用mixin语法简化代码
 header，footer作为public component
 login，reg，forget作为view，利用router进行切换
@@ -43,3 +44,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+=======
+# 第五周 3-15作业，前端代码部分
+>>>>>>> a75236a316d759d0f22642ee45de5a050f81e2b3
