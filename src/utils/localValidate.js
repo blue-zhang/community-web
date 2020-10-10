@@ -17,8 +17,7 @@ export default function () {
   })
   extend('notNum', {
     validate: value => {
-      console.log((/^\d{1,}/).test(value))
-      return !(/^\d{1,}/).test(value)
+      return !(/^\d{1,}$/).test(value)
     }
   })
 }
