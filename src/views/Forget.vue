@@ -124,9 +124,9 @@
   </div>
 </template>
 <script>
-import validate from '@/api/localValidate'
-import mixin from '@/api/mixin-login'
-import { forget } from '@/api/apiLogin'
+import validate from '@/utils/localValidate'
+import mixin from '@/utils/mixin-login'
+import { forget } from '@/api/login'
 validate()
 export default {
   name: 'Forget',

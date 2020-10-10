@@ -14,17 +14,20 @@ export default {
   components: {
     Header,
     Footer
+  },
+  mounted () {
+    console.log(window.layui)
   }
 }
 </script>
 
-<style lang="scss">
-@import "assets/layui/css/layui.css";
-@import "assets/css/global.css";
-@import "assets/layui/css/modules/layer/default/layer.css";
+<style lang="scss" >
+@import '../public/static/layui/css/layui.css';
+@import '../public/static/css/global.css';
+@import '../public/static/layui/css/modules/layer/default/layer.css';
 .svg-captcha {
   position: relative;
-  top: -10px
+  top: -10px;
 }
 .input-error {
   color: red;

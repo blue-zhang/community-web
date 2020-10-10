@@ -17,7 +17,15 @@ export default new Router({
     {
       path: '/reg',
       name: 'Reg',
-      component: Reg
+      component: Reg,
+      beforeEnter: (to, from, next) => {
+        if (from.path === '/login') {
+          // 执行下一个钩子，正常跳转
+          next()
+        } else {
+          next({ path: '/login' })
+        }
+      }
     },
     {
       path: '/forget',

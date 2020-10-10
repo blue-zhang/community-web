@@ -3,7 +3,7 @@
  @Name: 用户模块
 
  */
- 
+
 layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
 
   var $ = layui.jquery;
@@ -90,7 +90,7 @@ layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
               }
 
               res.rows = data;
-              
+
               view(res);
             };
 
@@ -109,7 +109,7 @@ layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
             });
           });
         } else {
-          fly.json('/api/'+ type +'/', {
+          fly.json('/utils/'+ type +'/', {
             page: curr
           }, function(res){
             view(res);
@@ -276,7 +276,7 @@ layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
       qq_id: 'QQ'
       ,weibo_id: '微博'
     })[type] + '吗？', {icon: 5}, function(){
-      fly.json('/api/unbind', {
+      fly.json('/utils/unbind', {
         type: type
       }, function(res){
         if(res.status === 0){
@@ -315,8 +315,8 @@ layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
         dom.minemsg.html('<div class="fly-none">您暂时没有最新消息</div>');
       }
     }
-    
-    
+
+
     /*
     fly.json('/message/find/', {}, function(res){
       var html = laytpl(tpl).render(res);
@@ -326,7 +326,7 @@ layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
       }
     });
     */
-    
+
     //阅读后删除
     dom.minemsg.on('click', '.mine-msg li .fly-delete', function(){
       var othis = $(this).parents('li'), id = othis.data('id');
@@ -361,5 +361,5 @@ layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
   dom.minemsg[0] && gather.minemsg();
 
   exports('user', null);
-  
+
 });

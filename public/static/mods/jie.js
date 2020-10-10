@@ -3,7 +3,7 @@
  @Name: 求解板块
 
  */
- 
+
 layui.define('fly', function(exports){
 
   var $ = layui.jquery;
@@ -12,7 +12,7 @@ layui.define('fly', function(exports){
   var laytpl = layui.laytpl;
   var form = layui.form;
   var fly = layui.fly;
-  
+
   var gather = {}, dom = {
     jieda: $('#jieda')
     ,content: $('#L_content')
@@ -64,7 +64,7 @@ layui.define('fly', function(exports){
       required[0].value = '';
       dom.jieda.find('.fly-none').remove();
       dom.jieda.append(html);
-      
+
       var count = dom.jiedaCount.text()|0;
       dom.jiedaCount.html(++count);
     });
@@ -76,7 +76,7 @@ layui.define('fly', function(exports){
     del: function(div){
       layer.confirm('确认删除该求解么？', function(index){
         layer.close(index);
-        fly.json('/api/jie-delete/', {
+        fly.json('/utils/jie-delete/', {
           id: div.data('id')
         }, function(res){
           if(res.status === 0){
@@ -87,11 +87,11 @@ layui.define('fly', function(exports){
         });
       });
     }
-    
+
     //设置置顶、状态
     ,set: function(div){
       var othis = $(this);
-      fly.json('/api/jie-set/', {
+      fly.json('/utils/jie-set/', {
         id: div.data('id')
         ,rank: othis.attr('rank')
         ,field: othis.attr('field')
@@ -139,7 +139,7 @@ layui.define('fly', function(exports){
   gather.jiedaActive = {
     zan: function(li){ //赞
       var othis = $(this), ok = othis.hasClass('zanok');
-      fly.json('/api/jieda-zan/', {
+      fly.json('/utils/jieda-zan/', {
         ok: ok
         ,id: li.data('id')
       }, function(res){
@@ -163,7 +163,7 @@ layui.define('fly', function(exports){
       var othis = $(this);
       layer.confirm('是否采纳该回答为最佳答案？', function(index){
         layer.close(index);
-        fly.json('/api/jieda-accept/', {
+        fly.json('/utils/jieda-accept/', {
           id: li.data('id')
         }, function(res){
           if(res.status === 0){
@@ -206,7 +206,7 @@ layui.define('fly', function(exports){
     ,del: function(li){ //删除
       layer.confirm('确认删除该回答么？', function(index){
         layer.close(index);
-        fly.json('/api/jieda-delete/', {
+        fly.json('/utils/jieda-delete/', {
           id: li.data('id')
         }, function(res){
           if(res.status === 0){
@@ -221,7 +221,7 @@ layui.define('fly', function(exports){
             layer.msg(res.msg);
           }
         });
-      });    
+      });
     }
   };
 

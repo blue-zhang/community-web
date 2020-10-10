@@ -1,25 +1,23 @@
 import { localize } from 'vee-validate'
-import zn from 'vee-validate/dist/locale/zh_CN.json'
 
 export default () => {
-  localize('zn', zn)
+  localize('zn')
   localize({
     zn: {
       names: {
         password: '密码',
         username: '用户名',
         code: '验证码',
-        email: '邮箱'
+        email: '邮箱',
+        fakename: '昵称'
       },
       fields: {
         username: {
-          required: '亲亲，用户名不能为空哦',
-          email: '亲亲，用户名应为邮箱格式',
-          minmax: '用户名位数在3到12位之间'
+          required: '亲亲，{_field_}不能为空哦'
         },
         password: {
           required: '亲亲，密码不能为空哦',
-          minmax: '密码位数在6到16位之间'
+          minmax: '{_field_}位数在{min}到{max}位之间'
         },
         code: {
           required: '亲亲，请填写验证码哦',
@@ -31,6 +29,11 @@ export default () => {
         },
         confirm: {
           is: '两次密码输入不一致'
+        },
+        fakename: {
+          required: '亲亲，请起一个昵称',
+          minmax: '{_field_}位数在{min}到{max}位之间',
+          notNum: '{_field_}不能全是数字哦'
         }
       }
     }
