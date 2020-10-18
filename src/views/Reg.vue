@@ -108,6 +108,12 @@
                       密码强度:{{ strength }}
                     </div>
                   </div>
+                  <!-- <lay-progress
+                    :percentage="percentage"
+                    theme="red"
+                    size="big"
+                    show-text
+                  /> -->
                   <div class="layui-form-item">
                     <label class="layui-form-label">确认密码</label>
                     <validation-provider
@@ -188,7 +194,7 @@
 </template>
 <script>
 import validate from '@/utils/localValidate'
-import mixin from '@/utils/mixin-login'
+import mixin from '@/mixin/mixin-login'
 import { register } from '@/api/login'
 import strengthValidate from '@/utils/stengthValidate'
 

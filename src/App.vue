@@ -14,9 +14,6 @@ export default {
   components: {
     Header,
     Footer
-  },
-  mounted () {
-    console.log(window.layui)
   }
 }
 </script>
@@ -27,7 +24,9 @@ export default {
 @import '../public/static/layui/css/modules/layer/default/layer.css';
 .svg-captcha {
   position: relative;
-  top: -10px;
+  top: -17px;
+  left: -13px;
+  transform: scale(0.9);
 }
 .input-error {
   color: red;

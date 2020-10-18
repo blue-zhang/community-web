@@ -1,14 +1,36 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+// 路由懒加载
 const Login = () => import(/* webpackChunkName: "Login" */'./views/Login')
 const Reg = () => import(/* webpackChunkName: "Reg" */'./views/Reg')
 const Forget = () => import(/* webpackChunkName: "Forget" */'./views/Forget')
+const Home = () => import(/* webpackChunkName: "Home" */'./views/Home')
+const HomeChannel = () => import(/* webpackChunkName: "HomeChannel" */'./views/channels/HomeChannel')
+const HomeIndex = () => import(/* webpackChunkName: "HomeIndex" */'./views/channels/HomeIndex')
+const Center = () => import(/* webpackChunkName: "Center" */'./views/Center')
 
 Vue.use(Router)
 
 export default new Router({
+  linkExactActiveClass: 'layui-this',
   routes: [
+    {
+      path: '/',
+      component: Home,
+      children: [
+        {
+          path: 'index/:catalog',
+          name: 'channel',
+          component: HomeChannel
+        },
+        {
+          path: '/',
+          name: 'index',
+          component: HomeIndex
+        }
+      ]
+    },
     {
       path: '/login',
       name: 'Login',
@@ -31,14 +53,11 @@ export default new Router({
       path: '/forget',
       name: 'Forget',
       component: Forget
+    },
+    {
+      path: '/center',
+      name: 'center',
+      component: Center
     }
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (about.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
-    // }
   ]
 })

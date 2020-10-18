@@ -119,7 +119,7 @@
 </template>
 <script>
 import validate from '@/utils/localValidate'
-import mixin from '@/utils/mixin-login'
+import mixin from '@/mixin/mixin-login'
 import { login } from '@/api/login'
 
 validate()
@@ -139,8 +139,10 @@ export default {
           this.vali_password = ''
           this.vali_username = ''
           this.vali_code = ''
-          console.log(res)
-          this.$alert(res.msg)
+          console.log('res', res.data)
+          this.$store.commit('getUserInfo', res.data)
+          this.$store.commit('getIsLogin', true)
+          this.$router.push({ name: 'index' })
         } else if (res.code === 401) {
           // 验证码错误
           this.$refs.form.setErrors({

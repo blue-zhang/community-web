@@ -120,7 +120,7 @@ pre{padding: 10px 15px; margin: 10px 0; font-size: 12px; border-left: 6px solid 
 .fly-avatar img{display: block; width: 45px; height: 45px; margin: 0; border-radius: 2px;}
 
 /* 徽章 */
-.fly-badge-vip{height: 16px; line-height: 16px; padding: 0 3px; background-color: #FF5722; color: #fff; border-radius: 2px;}
+.fly-badge-vip{height: 14px; line-height: 14px; background-color: #FF5722; color: #fff; border-radius: 2px;}
 .fly-badge-accept{height: 18px; line-height: 18px; padding: 0 5px !important; background-color: #5FB878; border-radius: 2px;}
 
 /* 赞助商 */
@@ -144,8 +144,7 @@ pre{padding: 10px 15px; margin: 10px 0; font-size: 12px; border-left: 6px solid 
 
 .fly-nav-user{position: absolute; top: 0; right: 0;}
 .fly-nav-user .iconfont{position: relative;}
-.fly-nav-avatar img{width: 36px; height: 36px; margin-left: 10px; border-radius: 100%;}
-.fly-nav-avatar  .icon-renzheng{font-size: 16px; top: 1px;}
+.fly-nav-avatar img{width: 40px; height: 40px; margin:0 10px 0 10px; border-radius: 100%;}
 .fly-nav-avatar .fly-badge-vip{position: relative; margin-left: 10px;}
 .fly-nav-user .layui-nav-child a i{position: relative; top: 2px; margin-right: 10px; font-size: 26px;}
 
@@ -510,7 +509,7 @@ body .fly-user-main{position: relative; min-height: 600px;}
   .fly-marginTop{margin-top: 0;}
 
   /* 头部 */
-  .fly-header .fly-nav-user li .fly-nav-avatar{padding-right: 15px;}
+  .fly-header .fly-nav-user li .fly-nav-avatar{padding-right: 10px;}
   .fly-header .fly-nav-user{margin-right: 5px;}
 
   /* 专栏 */

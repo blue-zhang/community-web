@@ -118,7 +118,7 @@
 </template>
 <script>
 import validate from '@/utils/localValidate'
-import mixin from '@/utils/mixin-login'
+import mixin from '@/mixin/mixin-login'
 import { forget } from '@/api/login'
 validate()
 export default {
