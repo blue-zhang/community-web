@@ -24,7 +24,7 @@ const mixin = {
       const sid = this.$store.state.sid
       getCaptcha(sid).then(res => {
         if (res.code === 200) {
-          this.vali_svg = res.result
+          this.vali_svg = res.data
         } else {
           console.log(' return captcha has err')
         }

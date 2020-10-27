@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
-/dist
+项目预览
+测试用例
 
 # local env files
 .env.local

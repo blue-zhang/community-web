@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './store'
+import store from './store/store'
 import Alert from './components/modules/alert/index'
-// import layui from 'vue-layui'
-// import 'vue-layui/lib/vue-layui.css'
+import Bubble from './components/modules/bubble/index'
 
 Vue.config.productionTip = false
 Vue.use(Alert)
+Vue.use(Bubble)
 // Vue.use(layui)
 new Vue({
   router,

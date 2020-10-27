@@ -1,5 +1,10 @@
 import axios from 'axios'
 import errorHandle from './errorHandle'
+import publicConfig from '../config/config'
+import { getRefresh } from '../api/refresh'
+import jwt from 'jsonwebtoken'
+import moment from 'dayjs'
+import store from '../store/store'
 
 const CancelToken = axios.CancelToken
 
@@ -11,10 +16,11 @@ class HttpRequest {
   }
 
   // 默认配置
-  getInsideConfig () {
+  commonConfig () {
     const config = {
       baseUrl: this.baseUrl,
       timeout: 100000,
+      // headers中还要加上Authorization = 'Bearer ' + token
       headers: {
         'Content-Type': 'application/json;charset=utf-8'
       }
@@ -23,13 +29,29 @@ class HttpRequest {
   }
 
   /**
-   * 函数作用: 重复请求处理函数
+ * 请求配置
+ */
+  requestConfig (options) {
+    // 创建axios实例
+    // 合并默认配置
+    // 创建拦截器
+    // 将配置传给axios实例并返回实例
+    const instance = axios.create()
+    const allConfig = Object.assign(this.commonConfig(), options)
+    this.interceptors(instance)
+    return instance(allConfig)
+  }
+
+  /**
+   * 重复请求处理函数
    */
-  removePending (key, isRequest = false) {
+  removeRequest (key, isRepeat = false) {
     if (this.cancel[key]) {
-      if (isRequest) {
-        this.cancel[key]('取消重复请求')
+      if (isRepeat) {
+        // 执行key的函数, 有一个mes参数
+        this.cancel[key]('取消重复请求' + key)
       } else {
+        // 删除key属性
         delete this.cancel[key]
       }
     }
@@ -43,17 +65,42 @@ class HttpRequest {
     instance.interceptors.request.use(
       config => {
         /**
-         * 函数作用: 请求没成功的时候，防止重复请求
-         * @params {key} string: 用于匹配请求是否为同一个
-         * @params {true} : 用于确定是否取消请求
-         */
-        let key = config.url + '&' + config.method
-        this.removePending(key, true)
-        config.cancelToken = new CancelToken((c) => {
-          this.cancel[key] = c
-        })
+        * @params {key} string: 用于匹配请求是否为同一个
+        * @params {true} : 用于确定是否取消请求
+        */
+        if (config.url !== '/refresh') {
+          let key = config.url + '&' + config.method
+          this.removeRequest(key, true)
+          config.cancelToken = new CancelToken((c) => {
+            // c是取消请求函数，cancel是对象。
+            // 将key属性的值设置为取消函数。如果请求重复了，就执行key的函数
+            this.cancel[key] = c
+          })
+        }
+
+        // jwt鉴权
+        const token = localStorage.getItem('token')
+        const refreshToken = localStorage.getItem('refreshToken')
+        // 判断是否为refresh请求
+        if (config.url !== '/refresh') {
+          let isPublic = false
+          publicConfig.publicPath.map((path) => {
+            // 只要匹配到是公共路径，则无论循环多少次，isPublic都是true
+            isPublic = isPublic || path.test(config.url)
+          })
+          // 存在token，且路径需要鉴权
+          if (!isPublic && token) {
+            config.headers.Authorization = 'Bearer ' + token
+          }
+        } else {
+          if (refreshToken) {
+            config.headers.Authorization = 'Bearer ' + refreshToken
+          }
+        }
+
         return config
       },
+      // 处理请求错误
       error => {
         errorHandle('request+', error)
         return Promise.reject(error)
@@ -61,41 +108,37 @@ class HttpRequest {
     )
     instance.interceptors.response.use(
       response => {
-        /**
-         * 函数作用: 请求成功了，可以再次请求。
-         * @params{key} string: 用来确定是之前的请求，this.cancel[key] = cy
-         * 不传true，则删除this.cancel[key]
-         */
+        // 取消重复请求的判定
         let key = response.config.url + '&' + response.config.method
-        this.removePending(key)
+        this.removeRequest(key)
+        // 处理响应数据
         if (response.status === 200) {
           return Promise.resolve(response.data)
         } else {
           return Promise.reject(response)
         }
       },
+      // 处理响应错误
       error => {
+        if (error.status === 401) {
+          const refreshToken = localStorage.getItem('refreshToken')
+          const refPayload = jwt.decode(refreshToken)
+          if (refPayload && moment().isBefore(moment(refPayload.exp * 1000))) {
+            const uid = refPayload._id
+            getRefresh(uid).then(res => {
+              console.log('refresh请求成功返回了')
+              store.commit('getToken', res.token)
+            })
+            return
+          }
+        }
         errorHandle(error)
         return Promise.reject(error)
       }
     )
   }
 
-  /**
-   * @函数作用: 用于合并axios默认配置和特定请求方式的配置，发送请求
-   * @param {options} options: 接受特定请求方法的参数
-   */
-  request (options) {
-    // 创建axios实例
-    const instance = axios.create()
-    // 将传递过来的options与默认axios的配置合并
-    const newOptions = Object.assign(this.getInsideConfig(), options)
-    // 创建拦截器
-    this.interceptors(instance)
-    // 用合并的配置创建请求
-    return instance(newOptions)
-  }
-
+  // config内容为{ params: {} }
   get (url, config) {
     const options = Object.assign(
       {
@@ -104,11 +147,11 @@ class HttpRequest {
       },
       config
     )
-    return this.request(options)
+    return this.requestConfig(options)
   }
 
   post (url, data) {
-    return this.request({
+    return this.requestConfig({
       method: 'post',
       url: url,
       data: data

@@ -2,25 +2,16 @@
   <div class="fly-panel fly-column">
     <div class="layui-container">
       <ul class="layui-clear">
-        <router-link
-          tag="li"
-          to="/"
-          class="layui-hide-xs"
-        ><a href="">首页</a></router-link>
-        <router-link
-          v-for="(item, index) in lists"
-          :key="'panel' + index"
-          tag="li"
-          :to="item.path"
-        ><a
-          href=""
-        >{{
+        <router-link tag="li"
+                     to="/index"
+                     class="layui-hide-xs"><a href="">首页</a></router-link>
+        <router-link v-for="(item, index) in lists"
+                     :key="'panel' + index"
+                     tag="li"
+                     :to="item.path"><a href="">{{
             item.type
-          }}<span
-            v-if=item.isDot
-            class="layui-badge-dot"
-          ></span></a
-        ></router-link>
+          }}<span v-if=item.isDot
+                  class="layui-badge-dot"></span></a></router-link>
         <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block">
           <span class="fly-mid"></span>
         </li>
@@ -34,19 +25,13 @@
       </ul>
       <div class="fly-column-right layui-hide-xs">
         <span class="fly-search"><i class="layui-icon"></i></span>
-        <a
-          href="jie/add.html"
-          class="layui-btn"
-        >发表新帖</a>
+        <a href="jie/add.html"
+           class="layui-btn">发表新帖</a>
       </div>
-      <div
-        class="layui-hide-sm layui-show-xs-block"
-        style="margin-top: -10px; padding-bottom: 10px; text-align: center"
-      >
-        <a
-          href="jie/add.html"
-          class="layui-btn"
-        >发表新帖</a>
+      <div class="layui-hide-sm layui-show-xs-block"
+           style="margin-top: -10px; padding-bottom: 10px; text-align: center">
+        <a href="jie/add.html"
+           class="layui-btn">发表新帖</a>
       </div>
     </div>
   </div>
@@ -64,7 +49,7 @@ export default {
         },
         {
           type: '建议',
-          path: '/index/advice',
+          path: '/index/advise',
           isDot: false
         },
         {

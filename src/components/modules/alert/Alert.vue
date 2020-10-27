@@ -3,14 +3,19 @@
     <div class="alert">
       <p class="alert-msg">{{ msg }}</p>
       <div v-if="type === 'alert'">
-        <div class="alert-btn success" @click="close()">确定</div>
+        <div class="alert-btn success pointer"
+             @click="close()">确定</div>
       </div>
-      <div v-else class="alert-btn-around">
-        <div class="alert-btn success" @click="successEvent()">确定</div>
-        <div class="alert-btn cancel" @click="cancelEvent()">取消</div>
+      <div v-else
+           class="alert-btn-around">
+        <div class="alert-btn success pointer"
+             @click="successEvent()">确定</div>
+        <div class="alert-btn cancel pointer"
+             @click="cancelEvent()">取消</div>
       </div>
     </div>
-    <div class="mask" @click="closeMask()"></div>
+    <div class="mask"
+         @click="closeMask()"></div>
   </div>
 </template>
 
@@ -78,7 +83,7 @@ $btn-cancel: #ededed;
   justify-content: center;
   align-items: center;
   padding: 20px 10px;
-  box-shadow: 0 5px 8px rgba($color: #000000, $alpha: 0.5);
+  box-shadow: 0 5px 8px 0 rgba($color: #000000, $alpha: 0.5);
   background: #fff;
   border-radius: 6px;
   z-index: 3000;

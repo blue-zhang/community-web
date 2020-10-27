@@ -1,57 +1,36 @@
 <template>
-  <div class="fly-panel" style="margin-bottom: 0">
+  <div class="fly-panel"
+       style="margin-bottom: 0">
     <div class="fly-panel-title fly-filter">
-      <a
-        href=""
-        :class="{ 'layui-this': isEnd === '' && tag === '' }"
-        @click.prevent="search(0)"
-        >综合</a
-      >
+      <a href=""
+         :class="{ 'layui-this': isEnd === '' && tag === '' }"
+         @click.prevent="search(0)">综合</a>
       <span class="fly-mid"></span>
-      <a
-        href=""
-        :class="{ 'layui-this': isEnd === '0' && tag === '' }"
-        @click.prevent="search(1)"
-        >未结</a
-      >
+      <a href=""
+         :class="{ 'layui-this': isEnd === '0' && tag === '' }"
+         @click.prevent="search(1)">未结</a>
       <span class="fly-mid"></span>
-      <a
-        href=""
-        :class="{ 'layui-this': isEnd === '1' && tag === '' }"
-        @click.prevent="search(2)"
-        >已结</a
-      >
+      <a href=""
+         :class="{ 'layui-this': isEnd === '1' && tag === '' }"
+         @click.prevent="search(2)">已结</a>
       <span class="fly-mid"></span>
-      <a
-        href=""
-        :class="{ 'layui-this': tag === '精华' }"
-        @click.prevent="search(3)"
-        >精华</a
-      >
+      <a href=""
+         :class="{ 'layui-this': tag === '精华' }"
+         @click.prevent="search(3)">精华</a>
       <span class="fly-filter-right layui-hide-xs">
-        <a
-          href=""
-          :class="{ 'layui-this': sort === 'created' }"
-          @click.prevent="search(4)"
-          >按最新</a
-        >
+        <a href=""
+           :class="{ 'layui-this': sort === 'created' }"
+           @click.prevent="search(4)">按最新</a>
         <span class="fly-mid"></span>
-        <a
-          href=""
-          :class="{ 'layui-this': sort === 'answer' }"
-          @click.prevent="search(5)"
-          >按热议</a
-        >
+        <a href=""
+           :class="{ 'layui-this': sort === 'answer' }"
+           @click.prevent="search(5)">按热议</a>
       </span>
     </div>
-    <!--
-    @作用: 内容列表组件，接收请求的数据
-    -->
-    <lists-item
-      :lists="lists"
-      @nextPage="nextPage()"
-      :isEnd="isEnd"
-    ></lists-item>
+    <lists-item :lists="lists"
+                @nextPage="nextPage()"
+                :isLastPage="isLastPage">
+    </lists-item>
   </div>
 </template>
 <script>
@@ -66,8 +45,15 @@ export default {
   mixins: [mixinHome],
   data() {
     return {
-      // 防止重复点击水平菜单多次发送请求
-      current: 0
+      // 防止点击菜单多次发送请求
+      current: 0,
+      isEnd: '',
+      tag: '',
+      sort: 'answer',
+      page: 0,
+      limit: 20,
+      catalog: 'index',
+      isTop: '0'
     }
   },
   watch: {
