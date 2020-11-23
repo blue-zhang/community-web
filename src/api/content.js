@@ -3,7 +3,7 @@ import axios from '../utils/request'
 
 /**
  * @接口名称:获取内容
- * @qs:将对象转化为字符串，前面路径要加？
+ * @qs:将对象转化为字符串，前面路径要加"?"
  */
 const getList = (options) => {
   return axios.get('/public/list?' + qs.stringify(options))
@@ -24,9 +24,29 @@ const getLinks = () => {
   return axios.get('/public/links')
 }
 
+// 保存草稿
+const saveDrafts = (options) => {
+  return axios.post('/content/drafts', {
+    ...options
+  })
+}
+// 获取草稿列表
+const getDrafts = () => {
+  return axios.get('/content/getDrafts')
+}
+// 删除一个草稿
+const delDrafts = (options) => {
+  return axios.post('/content/delDrafts', {
+    ...options
+  })
+}
+
 export {
   getList,
   getTips,
   getTop,
-  getLinks
+  getLinks,
+  saveDrafts,
+  getDrafts,
+  delDrafts
 }

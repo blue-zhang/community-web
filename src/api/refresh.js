@@ -1,9 +1,7 @@
 import axios from '../utils/request'
 
-const getRefresh = (uid) => {
-  return axios.post('/refresh', {
-    uid
-  })
+const getRefresh = () => {
+  return axios.get('/refresh')
 }
 
 export { getRefresh }

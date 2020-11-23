@@ -8,7 +8,8 @@ Bubble.install = function (Vue) {
   instance.$mount(document.createElement('div'))
   document.body.appendChild(instance.$el)
 
-  Vue.prototype.$bubble = function (user, mes, type) {
+  Vue.prototype.$bubble = function (mes, type = 'login', user = '') {
+    // vm.pro === data.pro // true
     instance.type = type
     instance.isShow = true
     instance.user = user

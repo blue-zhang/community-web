@@ -20,5 +20,9 @@ export default {
   },
   getIsLogin (state, val) {
     state.isLogin = val
+  },
+  getBarLists (state, val) {
+    state.barLists = val
+    localStorage.setItem('barLists', JSON.stringify(val))
   }
 }

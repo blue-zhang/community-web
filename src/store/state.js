@@ -1,4 +1,5 @@
 export default {
+  showFooter: true,
   sid: '',
   userInfo: {},
   isLogin: false,
@@ -33,24 +34,22 @@ export default {
       name: 'UserOther'
     }
   ],
-  setLists: [
+  // ProgressBar的信息
+  barLists: [
     {
-      title: '修改资料',
-      name: 'MyInfo'
+      name: '用户验证',
+      complete: false,
+      routerName: 'PwdVerify'
     },
     {
-      title: '上传头像',
-      name: 'HeadPic'
-
+      name: '修改绑定邮箱',
+      complete: false,
+      routerName: ''
     },
     {
-      title: '密码设置',
-      name: 'ChangePwd'
-    },
-    {
-      title: '账号绑定',
-      name: 'AccountBind'
-
+      name: '修改成功',
+      complete: false,
+      routerName: ''
     }
   ]
 }

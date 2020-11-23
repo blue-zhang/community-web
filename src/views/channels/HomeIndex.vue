@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Top></Top>
-    <Lists></Lists>
+    <top></top>
+    <lists></lists>
   </div>
 </template>
 <script>

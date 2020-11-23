@@ -1,4 +1,5 @@
 <template>
+  <!-- type由插件函数传递过来 -->
   <transition :name="type">
     <div class="bubble"
          ref="bubble"

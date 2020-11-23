@@ -46,12 +46,14 @@ const mixinHome = {
           // 判断是否为最后一页
           if (res.data.length < this.limit) {
             this.isLastPage = true
+          } else {
+            this.isLastPage = false
           }
           // 不一次性返回所有数据，每次翻页返回一次数据，利用concat拼接在一起
           if (this.lists.length === 0) {
             this.lists = res.data
           } else {
-            this.lists.concat(res.data)
+            this.lists = this.lists.concat(res.data)
           }
         }
       })

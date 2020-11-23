@@ -1,6 +1,6 @@
 <template>
   <div class="layui-container fly-marginTop fly-user-main">
-    <ul class="layui-nav layui-nav-tree layui-inline layui-bg-black"
+    <ul class="layui-nav layui-nav-tree layui-inline "
         :class="{ 'home-ul': $route.path === '/user/home' }"
         lay-filter="user">
       <router-link tag="li"
@@ -20,11 +20,19 @@
 
 <script>
 export default {
-  name: 'Center',
-  data() {
+  name: 'UserCenter',
+  data () {
     return {
       showType: 'home',
       lists: this.$store.state.centerLists
+    }
+  },
+  mounted () {
+  // 用户复制一个窗口，在原来的窗口退出登录，另一窗口刷新的时候，让它自动跳转到首页。
+  // 刷新一个窗口，并不会执行全局导航守卫，因为路由状态没有改变
+    if (this.$store.state.isLogin === false) {
+      console.log('axb')
+      this.$router.push({ name: 'index' })
     }
   }
 }
@@ -34,7 +42,7 @@ export default {
 @import '../assets/iconfont/iconfont.css';
 @import '../assets/scss/color.scss';
 .home-ul {
-  transform: translate(-100px, 0);
+  display: none;
 }
 ::v-deep .layui-nav-tree {
   width: 150px;
@@ -48,13 +56,11 @@ export default {
     line-height: 60px;
     text-align: left;
     padding-left: 16px;
-    font-size: 18px;
+    font-size: 16px;
     .iconfont {
       font-size: 20px;
       margin-right: 4px;
     }
   }
-}
-.user-home-container {
 }
 </style>

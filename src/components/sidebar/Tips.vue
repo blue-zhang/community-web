@@ -4,39 +4,19 @@
     <div class="tips-container">
       <ul class="fly-panel-main layui-row">
         <li class="layui-col-md6">
-          <a
-            href="/jie/4281/"
-            target="_blank"
-          >layuiqq</a
-          >
+          <a target="_blank">layui</a>
         </li>
         <li class="layui-col-md6">
-          <a
-            href="/jie/4281/"
-            target="_blank"
-          >layui</a
-          >
+          <a target="_blank">layui</a>
         </li>
         <li class="layui-col-md6">
-          <a
-            href="/jie/4281/"
-            target="_blank"
-          >layui</a
-          >
+          <a target="_blank">layui</a>
         </li>
         <li class="layui-col-md6">
-          <a
-            href="/jie/4281/"
-            target="_blank"
-          >layui</a
-          >
+          <a target="_blank">layui</a>
         </li>
         <li class="layui-col-md6">
-          <a
-            href="/jie/4281/"
-            target="_blank"
-          >layui</a
-          >
+          <a target="_blank">layui</a>
         </li>
       </ul>
     </div>

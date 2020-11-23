@@ -10,7 +10,7 @@ const CancelToken = axios.CancelToken
 
 // .request文件中传入baseUrl
 class HttpRequest {
-  constructor(baseUrl) {
+  constructor (baseUrl) {
     this.baseUrl = baseUrl
     this.cancel = {}
   }
@@ -28,9 +28,7 @@ class HttpRequest {
     return config
   }
 
-  /**
- * 请求配置
- */
+  // 请求配置
   requestConfig (options) {
     // 创建axios实例
     // 合并默认配置
@@ -62,12 +60,11 @@ class HttpRequest {
    * 拦截器作用2: 在响应数据返回之前，对响应的数据进行处理
    */
   interceptors (instance) {
+    // 使用decode，过期后也可以解析token
+    // let reqconfig = {}
     instance.interceptors.request.use(
       config => {
-        /**
-        * @params {key} string: 用于匹配请求是否为同一个
-        * @params {true} : 用于确定是否取消请求
-        */
+        // 在获得响应之前，取消重复请求
         if (config.url !== '/refresh') {
           let key = config.url + '&' + config.method
           this.removeRequest(key, true)
@@ -77,7 +74,6 @@ class HttpRequest {
             this.cancel[key] = c
           })
         }
-
         // jwt鉴权
         const token = localStorage.getItem('token')
         const refreshToken = localStorage.getItem('refreshToken')
@@ -85,19 +81,19 @@ class HttpRequest {
         if (config.url !== '/refresh') {
           let isPublic = false
           publicConfig.publicPath.map((path) => {
-            // 只要匹配到是公共路径，则无论循环多少次，isPublic都是true
             isPublic = isPublic || path.test(config.url)
           })
-          // 存在token，且路径需要鉴权
+          // 存在token，且路径不是public
           if (!isPublic && token) {
             config.headers.Authorization = 'Bearer ' + token
+            console.log('HttpRequest -> interceptors -> config.headers.Authorization', config.headers.Authorization)
           }
         } else {
           if (refreshToken) {
             config.headers.Authorization = 'Bearer ' + refreshToken
           }
         }
-
+        // reqconfig = config
         return config
       },
       // 处理请求错误
@@ -108,7 +104,7 @@ class HttpRequest {
     )
     instance.interceptors.response.use(
       response => {
-        // 取消重复请求的判定
+        // 获得响应，取消重复请求的判定
         let key = response.config.url + '&' + response.config.method
         this.removeRequest(key)
         // 处理响应数据
@@ -120,20 +116,25 @@ class HttpRequest {
       },
       // 处理响应错误
       error => {
-        if (error.status === 401) {
+        // 报401错误的时候，才会有error.response.status
+        const errRes = error.response ? error.response : { status: 0 }
+        if (errRes.status && errRes.status === 401) {
           const refreshToken = localStorage.getItem('refreshToken')
           const refPayload = jwt.decode(refreshToken)
           if (refPayload && moment().isBefore(moment(refPayload.exp * 1000))) {
-            const uid = refPayload._id
-            getRefresh(uid).then(res => {
+            getRefresh().then(res => {
               console.log('refresh请求成功返回了')
+              // 虽然token获取成功，但是本次请求已经失败，需要再次请求才可以
               store.commit('getToken', res.token)
+              // 重新发送本次请求，但是无法统一对返回的数据进行处理
+              // this.requestConfig(reqconfig)
+              return Promise.reject(error)
             })
-            return
           }
+        } else {
+          errorHandle(error)
+          return Promise.reject(error)
         }
-        errorHandle(error)
-        return Promise.reject(error)
       }
     )
   }

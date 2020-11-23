@@ -16,14 +16,25 @@ const getCaptcha = sid => {
     }
   })
 }
-
-// 忘记密码
-const forget = option => {
-  return axios.post('/login/forget', {
+// 用邮件或短信发送验证码
+const sendCode = option => {
+  return axios.post('/public/code', {
+    ...option
+  })
+}
+// 验证验证码
+const otherVerify = option => {
+  return axios.post('/public/verify', {
     ...option
   })
 }
 
+// 重置密码
+const reset = option => {
+  return axios.post('/login/reset', {
+    ...option
+  })
+}
 // 登录
 const login = option => {
   return axios.post('/login/login', {
@@ -37,4 +48,4 @@ const register = option => {
     ...option
   })
 }
-export { getCaptcha, forget, login, register }
+export { getCaptcha, login, register, reset, sendCode, otherVerify }

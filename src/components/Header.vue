@@ -1,19 +1,17 @@
 <template>
-  <div class="fly-header layui-bg-black mb20">
+  <div class="fly-header bg-img mb20">
     <div class="layui-container">
-      <!-- <a class="fly-logo">
-        <img src="../../public/static/images/logo.png" alt="layui" />
-      </a> -->
       <ul class="layui-nav fly-nav layui-hide-xs ml0">
         <li class="layui-nav-item layui-this">
           <router-link :to="{name: 'index'}"><i class="iconfont icon-jiaoliu"></i>主站</router-link>
         </li>
         <li class="layui-nav-item pointer"
             @click="css()">
-          <a><i class="iconfont icon-iconmingxinganli"></i>案例</a>
+          <a><i class="iconfont icon-iconmingxinganli"></i>css测试</a>
         </li>
-        <li class="layui-nav-item">
-          <a target="_blank"><i class="iconfont icon-ui"></i>框架</a>
+        <li class="layui-nav-item"
+            @click="api()">
+          <a><i class="iconfont icon-ui"></i>接口测试</a>
         </li>
       </ul>
 
@@ -89,6 +87,7 @@
 </template>
 
 <script>
+import axios from '@/utils/request'
 export default {
   name: 'Header',
   computed: {
@@ -102,7 +101,8 @@ export default {
   data() {
     return {
       isHover: false,
-      hoverCtrl: {}
+      hoverCtrl: {},
+      answer: 'asdf'
     }
   },
   methods: {
@@ -112,6 +112,17 @@ export default {
      */
     css() {
       this.$bubble('res.data.fakename', ' 欢迎回来', 'shake')
+    },
+    api () {
+      axios.get('https://yesno.wtf/api')
+        .then(function (response) {
+          this.answer = response.data.answer
+        })
+        .catch((error) => {
+          console.log('this', this)
+          console.log('this.answer', this.answer)
+          this.answer = 'Error! Could not reach the API. ' + error
+        })
     },
     show() {
       clearTimeout(this.hoverCtrl)
@@ -124,7 +135,6 @@ export default {
     },
     logout() {
       this.$confirm('你确定要退出吗？', () => {
-        console.log('要退出登录了！！！')
         localStorage.clear()
         this.$store.commit('getToken', '')
         this.$store.commit('getRefresh', '')
@@ -140,5 +150,22 @@ export default {
 <style lang='scss' scoped>
 li dd {
   cursor: pointer;
+}
+.bg-img {
+  background-image: url('../../src/assets/images/header.jpg');
+  background-clip: content-box;
+}
+.layui-nav {
+  .layui-nav-item {
+    .layui-nav-child {
+      a {
+        color: #333 !important;
+      }
+    }
+    a {
+      color: #ffffff !important;
+      cursor: pointer;
+    }
+  }
 }
 </style>

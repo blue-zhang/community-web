@@ -23,7 +23,7 @@ export default {
       tag: '',
       sort: 'answer',
       page: 0,
-      limit: 20,
+      limit: 10,
       catalog: 'index',
       // 置顶页面设置为1
       isTop: '1'

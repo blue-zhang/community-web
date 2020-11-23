@@ -1,5 +1,5 @@
 <template>
-  <div class="user-home-container">
+  <div>
     <div class="fly-home fly-panel"
          style="background-image: url();">
       <img src="https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg"

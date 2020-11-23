@@ -36,7 +36,7 @@
       </button>
       <button class="layui-btn layui-btn-disabled"
               v-else>
-        距下次签到{{countTime}}
+        签到倒计时{{countTime}}
       </button>
       <span v-if="!isSign">今日可获得<cite>{{fav}}</cite>积分</span>
       <span v-else>明日可获得<cite>{{fav}}</cite>积分</span>
@@ -137,7 +137,7 @@
 <script>
 import { getSign } from '../../api/user'
 import moment from 'dayjs'
-import countDownFn from '../../utils/countDown'
+import { countDown } from '../../utils/countDown'
 
 export default {
   name: 'Sign',
@@ -220,7 +220,7 @@ export default {
     sort(val) {
       this.type = val
     },
-    countDownFn,
+    countDown,
     sign() {
       getSign().then(res => {
         // 计算下次签到可得积分
@@ -231,7 +231,7 @@ export default {
         userInfo.lastSign = res.created
         userInfo.isSign = true
         // 签到成功，开始倒计时
-        this.countDownFn(() => {
+        this.countDown(() => {
           let userInfo = this.$store.state.userInfo
           userInfo.isSign = false
           this.$store.commit('getUserInfo', userInfo)
@@ -241,20 +241,24 @@ export default {
     }
   },
   mounted() {
-    // 页面刷新会清空vuex，且mounted先于beforeEach执行，即vuex还没有获得localStorage的数据，所以此时userInfo中没有数据，执行commit后，userinfo中只有isSign属性，进而导致localStorage的userInfo只有isSign属性，导致显示错误。
-    // let userInfo = this.$store.state.userInfo ? this.$store.state.userInfo : { lastSign: 0 }
-    let userInfo = JSON.parse(localStorage.getItem('userInfo')) ? JSON.parse(localStorage.getItem('userInfo')) : { lastSign: 0 }
-    if (moment(userInfo.lastSign).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
-      userInfo.isSign = true
-      this.countDownFn(() => {
-        let userInfo = this.$store.state.userInfo
+    // 页面刷新会清空vuex，且mounted先于beforeEach执行，即vuex还没有获得localStorage的数据.所以此时userInfo中没有数据，执行commit后，userinfo中只有isSign属性，进而导致localStorage的userInfo只有isSign属性，导致显示错误。
+    // let userInfo = this.$store.state.userInfo
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    // 没有登录时，localStorage中没有数据
+    const isLogin = this.$store.state.isLogin
+    if (isLogin) {
+      if (moment(userInfo.lastSign).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
+        userInfo.isSign = true
+        this.countDown(() => {
+          let userInfo = this.$store.state.userInfo
+          userInfo.isSign = false
+          this.$store.commit('getUserInfo', userInfo)
+        })
+      } else {
         userInfo.isSign = false
-        this.$store.commit('getUserInfo', userInfo)
-      })
-    } else {
-      userInfo.isSign = false
+      }
+      this.$store.commit('getUserInfo', userInfo)
     }
-    this.$store.commit('getUserInfo', userInfo)
   }
 }
 </script>

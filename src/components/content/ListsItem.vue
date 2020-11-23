@@ -36,7 +36,7 @@
           <span class="fly-list-nums">
             <i class="iconfont icon-pinglun1"
                title="回答"></i>
-            {{ item.answer }}
+            回复数：{{ item.answer }}
           </span>
         </div>
         <div class="fly-list-badge"
@@ -136,12 +136,4 @@ export default {
   font-size: 10px;
   color: #c2ccd0;
 }
-// .pic {
-//   position: relative;
-//   top: -10px;
-// }
-// .username {
-//   position: relative;
-//   bottom: 5px;
-// }
 </style>

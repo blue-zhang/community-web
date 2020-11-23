@@ -1,20 +1,24 @@
 <template>
-  <div v-show="isShow">
-    <div class="alert">
-      <p class="alert-msg">{{ msg }}</p>
-      <div v-if="type === 'alert'">
-        <div class="alert-btn success pointer"
-             @click="close()">确定</div>
+  <div>
+    <transition :name="'scale'">
+      <div class="alert"
+           v-show="isShow">
+        <p class="alert-msg">{{ msg }}</p>
+        <div v-if="type === 'alert'">
+          <div class="alert-btn success pointer"
+               @click="close()">确定</div>
+        </div>
+        <div v-else
+             class="alert-btn-around">
+          <div class="alert-btn success pointer"
+               @click="successEvent()">确定</div>
+          <div class="alert-btn cancel pointer"
+               @click="cancelEvent()">取消</div>
+        </div>
       </div>
-      <div v-else
-           class="alert-btn-around">
-        <div class="alert-btn success pointer"
-             @click="successEvent()">确定</div>
-        <div class="alert-btn cancel pointer"
-             @click="cancelEvent()">取消</div>
-      </div>
-    </div>
-    <div class="mask"
+    </transition>
+    <div v-show="isShow"
+         class="mask"
          @click="closeMask()"></div>
   </div>
 </template>
@@ -70,6 +74,20 @@ export default {
 $btn-main: #009688;
 $btn-dark: darken($btn-main, 5%);
 $btn-cancel: #ededed;
+.scale-leave-active {
+  transition: transform 0.3s, opacity 0.2s;
+}
+.scale-enter-active {
+  transition: transform 0.3s;
+}
+.scale-enter /* .fade-leave-active below version 2.1.8 */ {
+  transform: scale(0.3);
+}
+.scale-leave-to {
+  transform: translateY(-60px);
+  opacity: 0;
+}
+
 .alert {
   position: fixed;
   left: 50%;
@@ -120,14 +138,5 @@ $btn-cancel: #ededed;
   align-items: center;
   width: 100%;
   padding: 0 10px;
-}
-.mask {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  left: 0;
-  top: 0;
-  z-index: 2000;
 }
 </style>

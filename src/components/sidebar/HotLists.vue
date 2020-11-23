@@ -2,9 +2,10 @@
   <div>
     <dl class="fly-panel fly-list-one">
       <dt class="fly-panel-title">本周热议</dt>
-      <dd v-for="(item, index) in lists" :key="'hotlist' + index">
+      <dd v-for="(item, index) in lists"
+          :key="'hotlist' + index">
         <a href="jie/detail.html">{{ item.title }}</a>
-        <span><i class="iconfont icon-pinglun1"></i> {{ item.answer }}</span>
+        <span><i class="iconfont icon-pinglun1"></i> {{ item.reads }}次阅读</span>
       </dd>
       <!-- 无数据时 -->
       <!--
@@ -27,6 +28,7 @@ export default {
     getTop().then(res => {
       if (res.code === 200) {
         this.lists = res.data
+        console.log('mounted -> res.data', res.data)
       }
     })
   }

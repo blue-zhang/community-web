@@ -1,19 +1,26 @@
 <template>
-  <div class="layui-container mt15">
-    <div class="layui-row layui-col-space15">
-      <div class="layui-col-md8">
-        <panel></panel>
-        <router-view></router-view>
-      </div>
-      <div class="layui-col-md4">
-        <Tips />
-        <Sign />
-        <HotLists />
-        <Ads />
-        <Links />
+  <div>
+    <div class="layui-row">
+      <panel></panel>
+    </div>
+    <div class="layui-container">
+
+      <div class="layui-row layui-col-space15">
+
+        <div class="layui-col-md8">
+          <router-view></router-view>
+        </div>
+        <div class="layui-col-md4">
+          <tips />
+          <sign />
+          <hot-lists />
+          <ads />
+          <links />
+        </div>
       </div>
     </div>
   </div>
+
 </template>
 <script>
 import Ads from '../components/sidebar/Ads'

@@ -101,11 +101,9 @@
   </div>
 </template>
 <script>
-import validate from '@/utils/localValidate'
+
 import mixin from '@/mixin/mixin-login'
 import { login } from '@/api/login'
-
-validate()
 
 export default {
   name: 'Login',
@@ -122,12 +120,15 @@ export default {
           this.vali_password = ''
           this.vali_username = ''
           this.vali_code = ''
+          requestAnimationFrame(() => {
+            this.$refs.form && this.$refs.form.reset()
+          })
           this.$store.commit('getUserInfo', res.data)
           this.$store.commit('getIsLogin', true)
           this.$store.commit('getToken', res.token)
           this.$store.commit('getRefresh', res.refreshToken)
           this.$router.push({ name: 'index' })
-          this.$bubble(res.data.fakename, ' 欢迎回来', 'login')
+          this.$bubble(' 欢迎回来', 'login', res.data.fakename)
         } else if (res.code === 401) {
           // 验证码错误
           this.$refs.form.setErrors({
@@ -143,6 +144,7 @@ export default {
       })
     }
   },
+  // vue测试方法..
   mounted () {
     window.vue = this
   }

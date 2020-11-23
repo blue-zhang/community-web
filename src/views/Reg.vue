@@ -163,12 +163,10 @@
   </div>
 </template>
 <script>
-import validate from '@/utils/localValidate'
 import mixin from '@/mixin/mixin-login'
 import { register } from '@/api/login'
 import strengthValidate from '@/utils/stengthValidate'
 
-validate()
 export default {
   name: 'Forget',
   mixins: [mixin],
