@@ -58,13 +58,13 @@
           <span class="fr"
                 style="height: 60px; padding: 0 10px; margin: 0;">
             <button class="layui-btn layui-btn-sm layui-btn-radius"
-                    @click="showSubAlert">下一步</button>
-            <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-primary"
-                    @click="$emit('drafts')">存为草稿</button>
+                    :class='{"layui-btn-disabled": cannotSubmit}'
+                    title="标题大于5个字，内容大于15个字才能提交哦"
+                    @click.stop="showConfirm = true">下一步</button>
           </span>
-
         </div>
-        <textarea v-model="content"
+        <textarea :value="$store.state.post.content"
+                  @input="changeContent"
                   ref="editorArea"
                   @focus="focusHandler"
                   @blur="blurHandler"
@@ -110,7 +110,7 @@
       </div>
     </div>
     <add-confirm :showConfirm='showConfirm'
-                 @close='showConfirm = false'></add-confirm>
+                 @close-confirm='showConfirm = false'></add-confirm>
   </div>
 
 </template>
@@ -122,7 +122,8 @@ import EditorHref from './EditorHref'
 import EditorCode from './EditorCode'
 import EditorQuote from './EditorQuote'
 import EditorPreview from './EditorPreview'
-import AddConfirm from '@/components/content/AddConfirm'
+import AddConfirm from '@/views/Add/AddConfirm'
+
 export default {
   name: 'Editor',
   components: {
@@ -136,13 +137,17 @@ export default {
   },
   data () {
     return {
+      post: this.$store.state.post,
       currentType: '',
-      content: '',
       codeWidth: 400,
       codeHeight: 120,
       // pos是包括空格在内的光标的位置，以数字表示
       pos: 0,
       showConfirm: false,
+      // 禁止提交按钮
+      cannotSubmit: true,
+      // 检测内容是否变化
+      time: 0,
       lists: {
         pic: {
           name: 'editor-pic'
@@ -165,10 +170,40 @@ export default {
       }
     }
   },
-  props: {
-    lastContent: String
+  computed: {
+    content () {
+      return this.$store.state.post.content
+    }
+  },
+  // 关闭之后将编辑框返回到默认位置
+  watch: {
+    currentType: function (n, o) {
+      if (n === '' && n !== o && o !== 'face' && o !== 'pre') {
+        setTimeout(() => {
+          this.$refs[o].$el.style.left = '40%'
+          this.$refs[o].$el.style.top = '40%'
+        }, 250)
+      }
+    },
+    post: {
+      handler (n, o) {
+        // 刷新页面时不会执行
+        if (n.title.length < 5 || n.content.length < 15) {
+          this.cannotSubmit = true
+        } else {
+          this.cannotSubmit = false
+        }
+      },
+      deep: true
+    }
   },
   methods: {
+    // 改变内容
+    changeContent (e) {
+      const data = this.$store.state.post
+      data.content = e.target.value
+      this.$store.commit('getPost', data)
+    },
     // 点击图标，关闭或打开编辑弹框
     show (val) {
       if (this.currentType === val) {
@@ -191,13 +226,9 @@ export default {
       // 事件在body中被监听，防止继续冒泡
       e.stopPropagation()
       // 点击表情图标时也不能触发关闭，要触发show，不然一直点不开
-      if (this.$refs.icon.contains(e.target)) { return }
+      if (this.$refs.icon.contains(e.target) && !this.$refs.face.$el.contains(e.target)) { return }
       // 点击组件本身不能触发关闭事件！，但是点击表情后要关闭
-      if (!this.$refs.main.contains(e.target) || this.$refs.face.$el.contains(e.target)) { this.closeFn() }
-    },
-    // 显示下一步
-    showSubAlert () {
-      this.showConfirm = true
+      if (!this.$refs.main.contains(e.target)) { this.closeFn() }
     },
     // 把编辑器和表情中的内容添加到文本框中
     addContent (val) {
@@ -263,35 +294,18 @@ export default {
       this.pos = cursorPos
     }
   },
-  // 关闭之后将编辑框返回到默认位置
-  watch: {
-    currentType: function (n, o) {
-      if (n === '' && n !== o && o !== 'face' && o !== 'pre') {
-        setTimeout(() => {
-          this.$refs[o].$el.style.left = '40%'
-          this.$refs[o].$el.style.top = '40%'
-        }, 250)
-      }
-    },
-    content (n, o) {
-      this.$emit('add-content', n)
-    },
-    lastContent (n, o) {
-      if (n !== o) {
-        this.content = n
-      }
-    }
-  },
   async mounted () {
+    if (this.post.title.length < 5 || this.post.content.length < 15) {
+      this.cannotSubmit = true
+    } else {
+      this.cannotSubmit = false
+    }
     await this.$nextTick()
     document.querySelector('body').addEventListener('click', this.bodyClose)
     // 让code，quote编辑器的大小随页面变化
     this.codeWidth = this.$refs.editorArea.offsetWidth - 300
     this.codeHeight = this.$refs.editorArea.offsetHeight - 350
     window.addEventListener('resize', this.resizeHandler)
-  },
-  updated () {
-    // 数据改变时，触发add-content事件，用watch代替
   },
   beforeDestroy () {
     document.querySelector('body').removeEventListener('click', this.bodyClose)

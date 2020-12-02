@@ -5,6 +5,15 @@ export default {
   isLogin: false,
   token: '',
   refreshToken: '',
+  // 编辑页面，disable下一步按钮
+  cannotSubmit: false,
+  // 当前所使用的草稿箱
+  post: {
+    content: '',
+    title: '',
+    picUrl: ''
+  },
+  created: '',
   centerLists: [
     {
       title: '我的主页',

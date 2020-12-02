@@ -1,48 +1,33 @@
 <template>
-  <div>
-    <div class="layui-container fly-marginTop">
-      <div class="fly-panel pd100">
-        <div class="layui-form layui-form-pane">
-          <div class="layui-tab layui-tab-brief"
-               lay-filter="user">
-            <ul class="layui-tab-title">
-              <router-link tag="li"
-                           :to="{name: 'Add'}"
-                           class="">发表新帖
-              </router-link>
-              <li class="layui-this">草稿箱
-              </li>
-            </ul>
-            <table>
-              <tbody>
-                <tr>
-                  <td v-for="(item, index) in lists"
-                      :key="'AddDrafts' + index">
-                    <a class="draftItem-title"
-                       href=''>{{item.title}}</a>
-                    <div class="draftItem-meta">
-                      <div class="draftItem-time">{{item.created | _moment}}</div>
-                      <div class="draftItem-separator">·</div>
-                      <div>共 {{item.content.length}} 字</div>
-                      <div class="draftItem-separator">·</div>
-                      <div class="pointer del"
-                           @click="delDrafts(item.created)">删除</div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+  <table>
+    <tbody>
+      <tr>
+        <td v-for="(item, index) in lists"
+            :key="'AddDrafts' + index">
+          <span class="draftItem-title pointer"
+                @click.stop="selectPost(item.created)">{{item.title || '无标题'}}</span>
+          <div class="draftItem-meta">
+            <div class="draftItem-time">{{item.created | _moment}}</div>
+            <div class="draftItem-separator">·</div>
+            <div>共 {{item.content.length}} 字</div>
+            <div class="draftItem-separator">·</div>
+            <div class="pointer del"
+                 @click="delDrafts(item.created)">删除</div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
 </template>
 
 <script>
-import moment from 'moment'
 import { getDrafts, delDrafts } from '@/api/content'
+import moment from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/zh-cn'
+moment.extend(relativeTime)
+
 export default {
   name: 'AddDrafts',
   data () {
@@ -61,19 +46,18 @@ export default {
           }).then(this.$bubble('删除成功'))
         }
       })
+    },
+    selectPost (created) {
+      this.$router.push({ name: 'Add', params: { type: created } })
     }
   },
   filters: {
     _moment (val) {
       moment.locale('zh-cn')
-      /**
-       * @功能1: 超过1天，显示具体的创建日期
-       * @功能2: 1天之内，只显示多长时间之前创建的
-       */
       if (moment(val).isBefore(moment(moment().subtract(1, 'days')))) {
         return moment(val).format('YYYY-MM-DD')
       } else {
-        return moment(val).from(moment())
+        return moment(val).locale('zh-cn').from(moment())
       }
     }
   },
@@ -83,6 +67,19 @@ export default {
         this.lists = res.data
       }
     })
+  },
+  beforeRouteLeave (to, from, next) {
+    if (to.name === 'Add') {
+      next()
+    } else {
+      this.$store.commit('getCreated', '')
+      this.$store.commit('getPost', {
+        content: '',
+        title: '',
+        picUrl: ''
+      })
+      next()
+    }
   }
 }
 </script>

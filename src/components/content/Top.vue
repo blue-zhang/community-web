@@ -19,16 +19,13 @@ export default {
   name: 'Top',
   data() {
     return {
-      isEnd: '',
-      tag: '',
-      sort: 'answer',
-      page: 0,
       limit: 10,
       catalog: 'index',
       // 置顶页面设置为1
       isTop: '1'
     }
   },
+  // 用来初始化时显示置顶部分内容
   mixins: [mixinHome],
   components: {
     ListsItem

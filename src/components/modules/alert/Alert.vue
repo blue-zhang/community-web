@@ -71,72 +71,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$btn-main: #009688;
-$btn-dark: darken($btn-main, 5%);
-$btn-cancel: #ededed;
-.scale-leave-active {
-  transition: transform 0.3s, opacity 0.2s;
-}
-.scale-enter-active {
-  transition: transform 0.3s;
-}
-.scale-enter /* .fade-leave-active below version 2.1.8 */ {
-  transform: scale(0.3);
-}
-.scale-leave-to {
-  transform: translateY(-60px);
-  opacity: 0;
-}
-
-.alert {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  width: 300px;
-  height: 150px;
-  margin-left: -150px;
-  margin-top: -75px;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 10px;
-  box-shadow: 0 5px 8px 0 rgba($color: #000000, $alpha: 0.5);
-  background: #fff;
-  border-radius: 6px;
-  z-index: 3000;
-}
 .alert-msg {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-.alert-btn {
-  width: 105px;
-  height: 32px;
-  text-align: center;
-  line-height: 32px;
-  border-radius: 6px;
-  background: $btn-main;
-  &.cancel {
-    background: $btn-cancel;
-    color: #333;
-  }
-  &.success {
-    background: $btn-main;
-    color: #fff;
-    &:hover {
-      background: $btn-dark;
-    }
-  }
-}
-.alert-btn-around {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  padding: 0 10px;
 }
 </style>

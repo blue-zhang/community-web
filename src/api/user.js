@@ -14,7 +14,7 @@ const changePic = (option) => {
   return axios.post('/user/pic', option)
 }
 // 上传图片
-const uploadImg = (option) => {
-  return axios.post('/user/img', option)
+const uploadImg = (option, type = '', uid = '') => {
+  return axios.post('/user/img?' + `type=${type}&uid=${uid}`, option)
 }
 export { getSign, changeBasic, changePic, uploadImg }

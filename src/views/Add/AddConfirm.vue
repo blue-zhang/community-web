@@ -57,7 +57,7 @@
           <div class="alert-btn success pointer"
                @click="submitPost()">发布</div>
           <div class="alert-btn cancel pointer"
-               @click="close()">取消</div>
+               @click="$emit('close-confirm')">取消</div>
         </div>
       </div>
     </transition>
@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import { submitPost } from '@/api/content'
 export default {
   name: 'AddConfirm',
   props: {
@@ -110,7 +111,7 @@ export default {
           name: '公告'
         }
       ],
-      favsLists: [20, 40, 70, 120]
+      favsLists: [0, 20, 40, 70, 120, 1000]
     }
   },
   watch: {
@@ -142,16 +143,30 @@ export default {
       this.currentFavs = val
       this.showFavs = false
     },
-    close () {
-      // 单向数据流，不能修改父组件传来的值，此处偷懒
-      this.$emit('close')
-    },
     submitPost () {
-      if (this.showFavsInput) {
-
-      } else {
-
+      debugger
+      let userInfo = JSON.parse(localStorage.getItem('userInfo'))
+      const { content, title, picUrl, created } = this.$store.state.post
+      const catalog = this.currentType
+      let fav = this.currentFavs
+      if (fav > userInfo.favs) {
+        this.$bubble(`您的总积分为${userInfo.favs},积分不足`, 'shake')
+        return
       }
+      if (typeof fav === 'string') {
+        fav = 0
+      }
+      const submitData = {
+        content,
+        title,
+        picUrl,
+        catalog,
+        fav,
+        created
+      }
+      submitPost(submitData).then(res => {
+        // delDrafts({ created })
+      })
       this.close()
     },
     closeMask () {
@@ -162,71 +177,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$btn-main: #009688;
-$btn-dark: darken($btn-main, 5%);
-$btn-cancel: #ededed;
-.scale-leave-active {
-  transition: transform 0.3s, opacity 0.2s;
-}
-.scale-enter-active {
-  transition: transform 0.3s;
-}
-.scale-enter /* .fade-leave-active below version 2.1.8 */ {
-  transform: scale(0.3);
-}
-.scale-leave-to {
-  transform: translateY(-60px);
-  opacity: 0;
-}
-
-.alert {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  width: 300px;
-  height: 150px;
-  margin-left: -150px;
-  margin-top: -75px;
-  padding: 20px 10px;
-  box-shadow: 0 5px 8px 0 rgba($color: #000000, $alpha: 0.5);
-  background: #fff;
-  border-radius: 6px;
-  z-index: 3000;
-}
-.alert-btn {
-  width: 105px;
-  height: 32px;
-  text-align: center;
-  line-height: 32px;
-  border-radius: 6px;
-  background: $btn-main;
-  &.cancel {
-    background: $btn-cancel;
-    color: #333;
-  }
-  &.success {
-    background: $btn-main;
-    color: #fff;
-    &:hover {
-      background: $btn-dark;
-    }
-  }
-}
-.alert-btn-around {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  padding: 0 10px;
-}
-.mask {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  left: 0;
-  top: 0;
-  z-index: 2000;
-}
 </style>

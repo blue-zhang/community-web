@@ -24,5 +24,11 @@ export default {
   getBarLists (state, val) {
     state.barLists = val
     localStorage.setItem('barLists', JSON.stringify(val))
+  },
+  getPost (state, val) {
+    state.post = val
+  },
+  getCreated (state, val) {
+    state.created = val
   }
 }

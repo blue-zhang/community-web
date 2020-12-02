@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from '@/router/index'
 import store from './store/store'
 import Alert from './components/modules/alert/index'
 import Bubble from './components/modules/bubble/index'

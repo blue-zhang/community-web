@@ -30,6 +30,7 @@
           <span>发布于{{ item.created | _moment }}</span>
           <span>{{ item.reads }}次阅读</span>
           <span class="fly-list-kiss layui-hide-xs"
+                v-if="item.fav"
                 title="悬赏积分"><i class="layui-icon layui-icon-praise"></i>{{ item.fav }}</span>
           <span class="fly-list-kiss layui-hide-xs"
                 title="收藏数"><i class="layui-icon layui-icon-rate"></i>{{ item.star }}</span>
@@ -60,7 +61,10 @@
   </div>
 </template>
 <script>
-import moment from 'moment'
+import moment from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/zh-cn'
+moment.extend(relativeTime)
 
 export default {
   name: 'ListsItem',
@@ -102,7 +106,7 @@ export default {
       if (moment(val).isBefore(moment(moment().subtract(7, 'days')))) {
         return moment(val).format('YYYY-MM-DD')
       } else {
-        return moment(val).from(moment())
+        return moment(val).locale('zh-cn').from(moment())
       }
     },
     _catalog (val) {

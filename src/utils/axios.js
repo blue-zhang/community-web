@@ -8,7 +8,6 @@ import store from '../store/store'
 
 const CancelToken = axios.CancelToken
 
-// .request文件中传入baseUrl
 class HttpRequest {
   constructor (baseUrl) {
     this.baseUrl = baseUrl
@@ -61,7 +60,6 @@ class HttpRequest {
    */
   interceptors (instance) {
     // 使用decode，过期后也可以解析token
-    // let reqconfig = {}
     instance.interceptors.request.use(
       config => {
         // 在获得响应之前，取消重复请求
@@ -83,17 +81,14 @@ class HttpRequest {
           publicConfig.publicPath.map((path) => {
             isPublic = isPublic || path.test(config.url)
           })
-          // 存在token，且路径不是public
           if (!isPublic && token) {
             config.headers.Authorization = 'Bearer ' + token
-            console.log('HttpRequest -> interceptors -> config.headers.Authorization', config.headers.Authorization)
           }
         } else {
           if (refreshToken) {
             config.headers.Authorization = 'Bearer ' + refreshToken
           }
         }
-        // reqconfig = config
         return config
       },
       // 处理请求错误
@@ -123,11 +118,9 @@ class HttpRequest {
           const refPayload = jwt.decode(refreshToken)
           if (refPayload && moment().isBefore(moment(refPayload.exp * 1000))) {
             getRefresh().then(res => {
-              console.log('refresh请求成功返回了')
               // 虽然token获取成功，但是本次请求已经失败，需要再次请求才可以
               store.commit('getToken', res.token)
               // 重新发送本次请求，但是无法统一对返回的数据进行处理
-              // this.requestConfig(reqconfig)
               return Promise.reject(error)
             })
           }
@@ -139,7 +132,6 @@ class HttpRequest {
     )
   }
 
-  // config内容为{ params: {} }
   get (url, config) {
     const options = Object.assign(
       {
