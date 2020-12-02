@@ -111,7 +111,7 @@ class HttpRequest {
       },
       // 处理响应错误
       error => {
-        // 报401错误的时候，才会有error.response.status
+        // 返回401错误时，要发送refresh请求
         const errRes = error.response ? error.response : { status: 0 }
         if (errRes.status && errRes.status === 401) {
           const refreshToken = localStorage.getItem('refreshToken')
