@@ -7,7 +7,7 @@
         <validation-provider name="email"
                              rules="required|email"
                              v-slot="{ errors }">
-          <!-- <label class="layui-form-label">新邮箱</label> -->
+          <label class="layui-form-label">新邮箱</label>
           <div class="layui-input-inline ">
             <input type="text"
                    :disabled="isSubmit"
@@ -20,7 +20,7 @@
           </div>
           <button class="layui-btn"
                   type="submit"
-                  :class="{ 'layui-btn-disabled': isSubmit,  'layui-btn-normal': !isSubmit}">{{ isSubmit ? durtionCountTime + '后重新发送' : '发送验证邮件'}}</button>
+                  :class="{ 'layui-btn-disabled': isSubmit,  'layui-btn-normal': !isSubmit}">{{ isSubmit ? durtionCountTime + '秒后重新发送' : '发送验证邮件'}}</button>
         </validation-provider>
       </div>
       <div class="layui-word-aux flex-center-row">将对新邮箱发送验证邮件，点击验证邮件的链接，即可绑定新邮箱<a href="activate.html"
@@ -43,23 +43,25 @@ export default {
   },
   data () {
     return {
+      email: '',
       vali_email: '',
       isSubmit: false,
       // 设置默认值，因为定时器有点延迟
-      durtionCountTime: '1分30秒'
+      durtionCountTime: 60
     }
   },
   methods: {
     durtionCountDown,
     onSubmit () {
       this.isSubmit = true
-      this.durtionCountDown(config.sendCount, 'm', () => {
+      this.durtionCountDown(config.sendCount, () => {
         this.isSubmit = false
       })
       changeEmail({
         newEmail: this.vali_email
       }).then(res => {
         if (res.code === 200) {
+          // 通过邮件链接跳转到 Succ 页面，不在这里设置
           this.$alert(res.msg)
         } else {
           this.$alert(res.msg)
@@ -68,19 +70,29 @@ export default {
     }
   },
   mounted () {
-    // 改变progressbar的显示
-    let barLists = JSON.parse(localStorage.getItem('barLists'))
-    barLists[1].complete = true
-    this.$store.commit('getBarLists', barLists)
+    this.event.$emit('progress', 1)
     // 刷新页面后的定时器
-    this.durtionCountTime = '秒'
-    const countTime = localStorage.getItem('countTime')
-    if (countTime !== '0s' && countTime !== null) {
-      this.isSubmit = true
-      this.durtionCountDown(countTime, 'm', () => {
+    const countTime = Number(localStorage.getItem('countTime'))
+
+    if (countTime) {
+      this.durtionCountDown(countTime, () => {
         this.isSubmit = false
       })
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    const arr = ['PwdVerify', 'OtherVerify', 'EmailChange']
+    if (arr.every((name) => {
+      return from.name !== name
+    })) {
+      next({ path: '/' })
+    } else {
+      next()
+    }
+  },
+  beforeRouteLeave (to, from, next) {
+    localStorage.removeItem('countTime')
+    next()
   }
 }
 </script>

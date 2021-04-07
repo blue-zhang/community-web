@@ -4,9 +4,11 @@
     <div class="layui-form layui-form-pane"
          style="margin-top: 0">
       <div class="layui-tab layui-tab-brief">
-        <ul class="layui-tab-title">
+        <ul class="layui-tab-title"
+            v-show='!$route.params.updatePid'
+            style="minWidth: 700px;maxWidth: 700px">
           <router-link tag="li"
-                       :to="{name: 'Add'}"
+                       :to="{name: 'AddEditor'}"
                        :active-class='"layui-this"'>发表新帖
           </router-link>
           <router-link tag="li"
@@ -17,6 +19,7 @@
         <router-view></router-view>
       </div>
     </div>
+    <base-to-top></base-to-top>
   </div>
 </template>
 
@@ -24,40 +27,20 @@
 
 export default {
   name: 'Add',
-  methods: {
-    // 刷新页面时，页面卸载之前，执行beforeunload回调
-    onbeforeunload () {
-      const post = this.$store.state.post
-      localStorage.setItem('temPost', JSON.stringify({
-        title: post.title,
-        content: post.content,
-        picUrl: post.picUrl,
-        created: this.$store.state.created
-      }))
+  computed: {
+    post: function () {
+      return this.$store.state.post
     }
   },
-  created () {
-    // vuex在beforecreate的时候就已经有初始值了
-    // 刷新父组件的时候，把编辑的内容存在localstorage中
-    window.addEventListener('beforeunload', this.onbeforeunload)
-    // 在刷新后，localstorage中的内容存在vuex中
-    // 父组件created钩子之后子组件开始beforeCreate，因此子组件的watch不会监听到vuex的变化
-    let temPost = localStorage.getItem('temPost')
-    if (temPost) {
-      temPost = JSON.parse(temPost)
-      const data = {
-        title: temPost.title,
-        picUrl: temPost.picUrl,
-        content: temPost.content
-      }
-      this.$store.commit('getPost', data)
-      this.$store.commit('getCreated', temPost.created)
-      // 获取内容后把localStorage设为空
-      localStorage.setItem('temPost', '')
-    }
-  },
+  // 刷新不执行 destory 钩子，离开路由会执行
+  // 离开编辑页面路由后，再次进入，编辑页面的内容清空，用户要从草稿箱中找到之前的帖子
   beforeDestroy () {
-    window.removeEventListener('beforeunload', this.onbeforeunload)
+    this.$store.commit('setPost', {
+      content: '',
+      title: '',
+      picUrl: '',
+      created: ''
+    })
   }
 }
 </script>

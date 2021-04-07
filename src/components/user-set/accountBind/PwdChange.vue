@@ -24,7 +24,7 @@
         <validation-provider name="confirm"
                              rules="is:@password"
                              v-slot="{ errors }">
-          <label class="layui-form-label">确认密码</label>
+          <label class="layui-form-label">再输一次</label>
           <div class="layui-input-inline">
             <input type="password"
                    :disabled="isSubmit"
@@ -53,6 +53,10 @@ import { reset } from '@/api/login'
 
 export default {
   name: 'PwdChange',
+  components: {
+    ValidationProvider,
+    ValidationObserver
+  },
   data () {
     return {
       vali_password: '',
@@ -70,6 +74,7 @@ export default {
     onSubmit () {
       if (this.toName) {
         const userkey = this.$route.query.userkey
+        // 忘记密码，不需要知道原来的密码。需要 OtherVerify
         reset({
           userkey,
           password: this.vali_password
@@ -85,13 +90,14 @@ export default {
           }
         })
       } else {
+        // 更换密码，使用 PwdVerify
         changePwd({
           password: this.vali_password
         }).then(res => {
           if (res.code === 200) {
             this.isSubmit = true
             this.$alert(res.msg)
-            this.$router.push({ name: 'ChangeSucc', query: { type: 'PwdChange', msg: '您的密码修改成功' } })
+            this.$router.push({ name: 'ChangeSucc', query: { msg: '您的密码修改成功', textName: '修改密码' } })
           } else {
             this.$alert(res.msg)
           }
@@ -99,17 +105,17 @@ export default {
       }
     }
   },
-  components: {
-    ValidationProvider,
-    ValidationObserver
-  },
   mounted () {
-    // 改变progressbar的显示
-    // 如果是忘记密码功能，跳转到重置密码页面
-    if (!this.toName) {
-      let barLists = JSON.parse(localStorage.getItem('barLists'))
-      barLists[1].complete = true
-      this.$store.commit('getBarLists', barLists)
+    this.event.$emit('progress', 1)
+  },
+  beforeRouteEnter (to, from, next) {
+    const arr = ['PwdVerify', 'OtherVerify', 'PwdChange']
+    if (arr.every((name) => {
+      return from.name !== name
+    })) {
+      next({ path: '/' })
+    } else {
+      next()
     }
   }
 }

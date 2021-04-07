@@ -1,7 +1,7 @@
 <template>
+  <!-- 已废除 -->
   <editor-alert @close="$emit('close')"
                 @confirm-edit='confirmEdit'
-                ref="editorPic"
                 :title="'插入图片'">
     <div class="editor-pic">
       <label class="layui-form-label">图片地址</label>
@@ -14,7 +14,7 @@
               class="layui-btn layui-btn-primary upload-img pointer ml20">
         <i class="layui-icon mr15">&#xe67c;</i>
         <label for="file"
-               class="pointer">上传头像</label>
+               class="pointer">本地选择</label>
         <input type="file"
                name="file"
                ref="file"
@@ -61,19 +61,21 @@ export default {
           this.picUrl = baseUrl + res.path
         }
       })
+      this.$emit('confirmEdit', this.picUrl)
     },
     confirmEdit () {
+      debugger
+      // 不能直接用 url !!!!!!!!!!!!!
       if (!this.picUrl) {
-        // 没有链接也没有发送
-        document.querySelector('#text').focus()
         this.$bubble('请上传图片', 'shake')
       } else {
         this.$emit('confirmEdit', this.picUrl)
-        setTimeout(() => {
-          this.picUrl = ''
-          // 触发change事件
-          this.$refs.file.value = ''
-        }, 0)
+        // 后端保存这个图片，并返回后端的的url
+        // setTimeout(() => {
+        //   this.picUrl = ''
+        //   // 触发change事件
+        //   this.$refs.file.value = ''
+        // }, 0)
       }
     }
   }

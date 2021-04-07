@@ -191,20 +191,9 @@ export default {
           this.vali_code = ''
           this.$alert(res.msg)
           setTimeout(this.$router.push({ path: '/login' }), 1000)
-        } else if (res.code === 401) {
-          // 验证码错误
+        } else {
           this.$refs.form.setErrors({
             code: res.msg
-          })
-        } else if (res.code === 403) {
-          // 昵称已存在
-          this.$refs.form.setErrors({
-            fakename: res.msg
-          })
-        } else if (res.code === 405) {
-          // 邮箱已存在
-          this.$refs.form.setErrors({
-            email: res.msg
           })
         }
       })

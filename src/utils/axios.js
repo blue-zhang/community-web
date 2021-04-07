@@ -1,10 +1,6 @@
 import axios from 'axios'
 import errorHandle from './errorHandle'
 import publicConfig from '../config/config'
-import { getRefresh } from '../api/refresh'
-import jwt from 'jsonwebtoken'
-import moment from 'dayjs'
-import store from '../store/store'
 
 const CancelToken = axios.CancelToken
 
@@ -17,7 +13,7 @@ class HttpRequest {
   // 默认配置
   commonConfig () {
     const config = {
-      baseUrl: this.baseUrl,
+      baseURL: this.baseUrl,
       timeout: 100000,
       // headers中还要加上Authorization = 'Bearer ' + token
       headers: {
@@ -25,18 +21,6 @@ class HttpRequest {
       }
     }
     return config
-  }
-
-  // 请求配置
-  requestConfig (options) {
-    // 创建axios实例
-    // 合并默认配置
-    // 创建拦截器
-    // 将配置传给axios实例并返回实例
-    const instance = axios.create()
-    const allConfig = Object.assign(this.commonConfig(), options)
-    this.interceptors(instance)
-    return instance(allConfig)
   }
 
   /**
@@ -54,49 +38,35 @@ class HttpRequest {
     }
   }
 
-  /**
-   * 拦截器作用1: 在请求之前，对请求的配置config进行修改
-   * 拦截器作用2: 在响应数据返回之前，对响应的数据进行处理
-   */
   interceptors (instance) {
-    // 使用decode，过期后也可以解析token
+    // 在请求之前，对请求的配置config进行修改
     instance.interceptors.request.use(
       config => {
         // 在获得响应之前，取消重复请求
-        if (config.url !== '/refresh') {
-          let key = config.url + '&' + config.method
-          this.removeRequest(key, true)
-          config.cancelToken = new CancelToken((c) => {
-            // c是取消请求函数，cancel是对象。
-            // 将key属性的值设置为取消函数。如果请求重复了，就执行key的函数
-            this.cancel[key] = c
-          })
-        }
+        let key = config.url + '&' + config.method
+        this.removeRequest(key, true)
+        config.cancelToken = new CancelToken((c) => {
+          // c是取消请求函数，cancel是对象。
+          // 将key属性的值设置为取消函数。如果请求重复了，就执行key的函数
+          this.cancel[key] = c
+        })
         // jwt鉴权
         const token = localStorage.getItem('token')
-        const refreshToken = localStorage.getItem('refreshToken')
-        // 判断是否为refresh请求
-        if (config.url !== '/refresh') {
-          let isPublic = false
-          publicConfig.publicPath.map((path) => {
-            isPublic = isPublic || path.test(config.url)
-          })
-          if (!isPublic && token) {
-            config.headers.Authorization = 'Bearer ' + token
-          }
-        } else {
-          if (refreshToken) {
-            config.headers.Authorization = 'Bearer ' + refreshToken
-          }
+        let isPublic = false
+        publicConfig.publicPath.map((path) => {
+          isPublic = isPublic || path.test(config.url)
+        })
+        if (!isPublic && token) {
+          config.headers.Authorization = 'Bearer ' + token
         }
         return config
       },
-      // 处理请求错误
       error => {
-        errorHandle('request+', error)
+        errorHandle(error)
         return Promise.reject(error)
       }
     )
+    // 在响应数据返回之前，对响应的数据进行处理
     instance.interceptors.response.use(
       response => {
         // 获得响应，取消重复请求的判定
@@ -109,27 +79,23 @@ class HttpRequest {
           return Promise.reject(response)
         }
       },
-      // 处理响应错误
-      error => {
-        // 返回401错误时，要发送refresh请求
-        const errRes = error.response ? error.response : { status: 0 }
-        if (errRes.status && errRes.status === 401) {
-          const refreshToken = localStorage.getItem('refreshToken')
-          const refPayload = jwt.decode(refreshToken)
-          if (refPayload && moment().isBefore(moment(refPayload.exp * 1000))) {
-            getRefresh().then(res => {
-              // 虽然token获取成功，但是本次请求已经失败，需要再次请求才可以
-              store.commit('getToken', res.token)
-              // 重新发送本次请求，但是无法统一对返回的数据进行处理
-              return Promise.reject(error)
-            })
-          }
-        } else {
-          errorHandle(error)
-          return Promise.reject(error)
-        }
+      async error => {
+        const result = await errorHandle(error)
+        return result ? Promise.resolve(result) : Promise.reject(error)
       }
     )
+  }
+
+  // 请求配置
+  requestConfig (options) {
+    // 创建axios实例
+    // 合并默认配置
+    // 创建拦截器
+    // 将配置传给axios实例并返回实例
+    const instance = axios.create()
+    const allConfig = Object.assign(this.commonConfig(), options)
+    this.interceptors(instance)
+    return instance(allConfig)
   }
 
   get (url, config) {

@@ -13,10 +13,9 @@ export default function (content = '') {
   // 匹配表情
   if (faceReg.test(pre)) {
     let arr = pre.match(faceReg)
-    console.log('arr', arr)
     arr.map(item => {
       const key = item.match(/\[[\u4E00-\u9FA5]+\]/g)
-      pre = pre.replace(item, `<img src="${face[key]}" alt="wrong" />`)
+      pre = pre.replace(item, `<img src="${face[key]}" alt=wrong />`)
     })
   }
   // 匹配图片

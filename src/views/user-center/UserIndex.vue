@@ -2,17 +2,15 @@
   <div class="fly-panel fly-panel-user"
        pad20>
     <div class="container">
-      <div class="layui-col-md12"
-           style="margin: 10px 0 2.5px 0"><b>Hi,你已经是我们的正式会员了</b></div>
-
       <div class="info layui-row layui-col-space15">
         <div class="layui-col-sm12 layui-col-md6">
           <div class="border">
-            <p>我的会员信息</p>
+            <p>我的等级信息</p>
             <div class="vip-mes">
               <div>经验积分：{{favs}}</div>
+              <div>您的等级：{{$store.state.userInfo.lv}}</div>
               <div>您当前为：<span class="layui-badge fly-badge-vip layui-hide-xs"
-                      v-if="isVip !== '0'">VIP{{ isVip }}</span><span v-else>普通用户</span></div>
+                      v-if="isVip !== '0'">VIP</span><span v-else>普通用户</span></div>
             </div>
           </div>
         </div>
@@ -51,10 +49,10 @@ export default {
     }
   },
   computed: {
-    favs() {
+    favs () {
       return this.$store.state.userInfo.favs
     },
-    isVip() {
+    isVip () {
       return this.$store.state.userInfo.isVip
     }
   }
@@ -62,7 +60,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/scss/color.scss';
+@import "../../assets/scss/color.scss";
 .container {
   font-size: 16px;
   .info {

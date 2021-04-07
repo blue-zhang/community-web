@@ -28,7 +28,7 @@
                         <input type="text"
                                name="name"
                                class="layui-input"
-                               placeholder="请输入邮箱或昵称"
+                               placeholder="请输入邮箱"
                                v-model="vali_username" />
                       </div>
                       <div class="input-error layui-form-mid">
@@ -69,9 +69,11 @@
                         </div>
                       </div>
                     </validation-provider>
+                    <!-- 验证码 -->
                     <div class="svg-captcha layui-form-mid"
                          v-html="vali_svg"
-                         @click="_getCaptcha()"></div>
+                         @click="_getCaptcha()">
+                    </div>
                   </div>
                   <div class="layui-form-item">
                     <button type="submit"
@@ -123,10 +125,10 @@ export default {
           requestAnimationFrame(() => {
             this.$refs.form && this.$refs.form.reset()
           })
-          this.$store.commit('getUserInfo', res.data)
-          this.$store.commit('getIsLogin', true)
-          this.$store.commit('getToken', res.token)
-          this.$store.commit('getRefresh', res.refreshToken)
+          this.$store.commit('setUserInfo', res.data)
+          this.$store.commit('setIsLogin', true)
+          this.$store.commit('setToken', res.token)
+          this.$store.commit('setRefresh', res.refreshToken)
           this.$router.push({ name: 'index' })
           this.$bubble(' 欢迎回来', 'login', res.data.fakename)
         } else if (res.code === 401) {
@@ -134,9 +136,6 @@ export default {
           this.$refs.form.setErrors({
             code: res.msg
           })
-        } else if (res.code === 402) {
-          // 找不到用户名
-          this.$alert(res.msg)
         } else if (res.code === 404) {
           // 用户名或密码错误
           this.$alert(res.msg)

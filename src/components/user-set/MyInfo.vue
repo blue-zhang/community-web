@@ -4,22 +4,25 @@
       <label class="layui-form-label">昵称</label>
       <div class="layui-input-inline">
         <input type="text"
-               v-model="fakename"
+               v-model="info.fakename"
                class="layui-input">
       </div>
     </div>
     <div class="layui-form-item">
       <label class="layui-form-label">性别</label>
       <div class="gender-btn-container">
-        <button class="gender-btn"
-                :class="{'gender-btn-click': gender === '0'}"
+        <button type="button"
+                class="gender-btn"
+                :class="{'gender-btn-click': info.gender === '0'}"
                 @click="genderSelect('0')">男</button>
-        <button class="gender-btn"
+        <button type="button"
+                class="gender-btn"
                 @click="genderSelect('1')"
-                :class="{'gender-btn-click': gender === '1'}">女</button>
-        <button class="gender-btn"
+                :class="{'gender-btn-click': info.gender === '1'}">女</button>
+        <button type="button"
+                class="gender-btn"
                 @click="genderSelect('2')"
-                :class="{'gender-btn-click': gender === '2'}">保密</button>
+                :class="{'gender-btn-click': info.gender === '2'}">保密</button>
       </div>
 
     </div>
@@ -28,31 +31,33 @@
       <div class="layui-input-block">
         <textarea placeholder="随便写些什么刷下存在感"
                   class="layui-textarea"
-                  v-model="regmark"
+                  v-model="info.regmark"
                   style="height: 70px;"></textarea>
       </div>
     </div>
-    <div class="layui-form-item">
+    <!-- <div class="layui-form-item">
       <label class="layui-form-label">城市</label>
       <div class="layui-input-inline">
         <input type="text"
                placeholder="有待开发"
-               v-model="location"
+               v-model="info.location"
                class="layui-input">
       </div>
-    </div>
+    </div> -->
     <div class="layui-form-item">
       <label class="layui-form-label">出生日期</label>
       <div class="layui-input-inline">
         <input type="text"
                id="test1"
                readonly
-               v-model="birthday"
+               v-model="info.birthday"
                class="layui-input">
       </div>
     </div>
     <div class="layui-form-item">
-      <button class="layui-btn"
+      <button type="button"
+              class="layui-btn"
+              :class="{ 'layui-btn-disabled': notSubmit}"
               @click="submit()">确认修改</button>
     </div>
   </form>
@@ -64,55 +69,68 @@ export default {
   name: 'MyInfo',
   data () {
     return {
-      gender: '',
-      location: '',
-      birthday: '',
-      regmark: '',
-      fakename: ''
+      unwatch: '',
+      notSubmit: true,
+      info: {
+        gender: '',
+        location: '',
+        birthday: '',
+        regmark: '',
+        fakename: ''
+      }
     }
   },
   methods: {
+
     genderSelect (val) {
-      this.gender = val
+      this.info.gender = val
     },
     submit () {
-    // 用户id由后端从token中获取
-      const option = {
-        fakename: this.fakename,
-        birthday: this.birthday,
-        location: this.location,
-        regmark: this.regmark,
-        gender: this.gender
-      }
-      changeBasic(option).then(res => {
-        console.log('submit -> res', res)
+      changeBasic({ ...this.info }).then(res => {
+        // this.unwatch()
         let userInfo = JSON.parse(localStorage.getItem('userInfo'))
-        userInfo.fakename = res.fakename
-        userInfo.birthday = res.birthday
-        userInfo.location = res.location
-        userInfo.regmark = res.regmark
-        userInfo.gender = res.gender
-        this.$store.commit('getUserInfo', userInfo)
+        userInfo.fakename = res.result.fakename
+        userInfo.birthday = res.result.birthday
+        userInfo.location = res.result.location
+        userInfo.regmark = res.result.regmark
+        userInfo.gender = res.result.gender
+        // this.info = res.result
+        this.$store.commit('setUserInfo', userInfo)
         this.$alert(res.msg)
+        this.notSubmit = true
+        // this.unwatch = this.$watch('info', function () {
+        //   console.log('watch')
+        //   this.notSubmit = false
+        // }, {
+        //   deep: true
+        // })
       })
     }
   },
-  mounted () {
+  created () {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'))
-    this.fakename = userInfo.fakename
-    this.birthday = userInfo.birthday
-    this.location = userInfo.location
-    this.regmark = userInfo.regmark
-    this.gender = userInfo.gender
+    // 这里不适合解构赋值，因为 info 对象每个属性对应的值不是变量
+    this.info.fakename = userInfo.fakename
+    this.info.birthday = userInfo.birthday
+    this.info.location = userInfo.location
+    this.info.regmark = userInfo.regmark
+    this.info.gender = userInfo.gender
     const _this = this
     window.layui.use('laydate', function () {
       var laydate = window.layui.laydate
       laydate.render({
         elem: '#test1',
         done: function (value, date, endDate) {
-          _this.birthday = value
+          _this.info.birthday = value
         }
       })
+    })
+  },
+  mounted () {
+    this.unwatch = this.$watch('info', function () {
+      this.notSubmit = false
+    }, {
+      deep: true
     })
   }
 }

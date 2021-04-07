@@ -16,4 +16,16 @@ const updateEmail = (option) => {
 const changePwd = (option) => {
   return axios.post('/user/changePwd', option)
 }
-export { pwdVerify, changeEmail, updateEmail, changePwd }
+// 用邮件发送验证码
+const sendEmail = option => {
+  return axios.post('/user/sendEmail', {
+    ...option
+  })
+}
+// 验证验证码
+const otherVerify = option => {
+  return axios.post('/user/otherVerify', {
+    ...option
+  })
+}
+export { pwdVerify, changeEmail, updateEmail, changePwd, sendEmail, otherVerify }

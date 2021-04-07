@@ -6,7 +6,7 @@
            placeholder="给链接起一个名字"
            title="如果不指定，名字就是链接本身"
            v-model="name"
-           class="layui-input">
+           class="layui-input editor-alert">
     <input type="text"
            ref="link"
            placeholder="输入链接地址"

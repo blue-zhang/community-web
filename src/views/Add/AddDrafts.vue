@@ -2,18 +2,22 @@
   <table>
     <tbody>
       <tr>
-        <td v-for="(item, index) in lists"
+        <td v-show="lists.length !== 0"
+            v-for="(item, index) in lists"
             :key="'AddDrafts' + index">
           <span class="draftItem-title pointer"
-                @click.stop="selectPost(item.created)">{{item.title || '无标题'}}</span>
+                @click.stop="selectPost(item._id)">{{item.title || '无标题'}}</span>
           <div class="draftItem-meta">
-            <div class="draftItem-time">{{item.created | _moment}}</div>
+            <div class="draftItem-time">{{item.updated | _moment}}</div>
             <div class="draftItem-separator">·</div>
             <div>共 {{item.content.length}} 字</div>
             <div class="draftItem-separator">·</div>
             <div class="pointer del"
-                 @click="delDrafts(item.created)">删除</div>
+                 @click="delDrafts(item._id)">删除</div>
           </div>
+        </td>
+        <td v-show="lists.length === 0">
+          <span class="draftItem-title pointer"> 您的草稿箱为空 </span>
         </td>
       </tr>
     </tbody>
@@ -23,22 +27,20 @@
 
 <script>
 import { getDrafts, delDrafts } from '@/api/content'
-import moment from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import 'dayjs/locale/zh-cn'
-moment.extend(relativeTime)
 
 export default {
   name: 'AddDrafts',
   data () {
     return {
-      lists: []
+      lists: [],
+      id: ''
     }
   },
   methods: {
-    delDrafts (val) {
-      delDrafts({ created: val }).then(res => {
+    delDrafts (id) {
+      delDrafts({ id: id }).then(res => {
         if (res.code === 200) {
+          // 获取草稿箱列表，不传参数
           getDrafts().then(res => {
             if (res.code === 200) {
               this.lists = res.data
@@ -47,39 +49,33 @@ export default {
         }
       })
     },
-    selectPost (created) {
-      this.$router.push({ name: 'Add', params: { type: created } })
-    }
-  },
-  filters: {
-    _moment (val) {
-      moment.locale('zh-cn')
-      if (moment(val).isBefore(moment(moment().subtract(1, 'days')))) {
-        return moment(val).format('YYYY-MM-DD')
-      } else {
-        return moment(val).locale('zh-cn').from(moment())
-      }
+    selectPost (id) {
+      this.id = id
+      this.$router.push({ name: 'AddEditor', query: { pid: this.id } })
     }
   },
   mounted () {
+    // 获取草稿箱列表，不传参数
     getDrafts().then(res => {
       if (res.code === 200) {
         this.lists = res.data
       }
     })
   },
-  beforeRouteLeave (to, from, next) {
-    if (to.name === 'Add') {
-      next()
-    } else {
-      this.$store.commit('getCreated', '')
-      this.$store.commit('getPost', {
-        content: '',
-        title: '',
-        picUrl: ''
-      })
-      next()
+  async beforeRouteLeave (to, from, next) {
+    if (to.name === 'AddEditor' && this.id) {
+      const res = await getDrafts(this.id)
+      if (res.code === 200) {
+        this.$store.commit('setPost', {
+          content: res.data.content,
+          title: res.data.title,
+          picUrl: res.data.picUrl,
+          pid: res.data._id
+        })
+        this.id = ''
+      }
     }
+    next()
   }
 }
 </script>

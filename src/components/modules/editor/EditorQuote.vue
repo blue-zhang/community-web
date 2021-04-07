@@ -4,6 +4,7 @@
                 :title="'插入引用'">
     <textarea v-model="quote"
               name="desc"
+              class="editor-alert"
               ref="quote"
               placeholder="请输入内容"
               :style="{width: codeWidth + 'px', height: codeHeight + 'px', minHeight: '150px', minWidth: '402px'}"></textarea>
@@ -26,7 +27,6 @@ export default {
   methods: {
     confirmEdit () {
       if (!this.quote) {
-        this.$refs.quote.focus()
         this.$bubble('请插入引用', 'shake')
       } else {
         this.$emit('confirmEdit', this.quote)

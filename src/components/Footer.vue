@@ -1,14 +1,6 @@
 <template>
   <div v-if="showFooter"
        class="fly-footer">
-    <p>
-      <a href="/"
-         target="_blank">Imooc社区</a> 2017 &copy;
-    </p>
-    <p>
-      <a href=""
-         target="_blank">微信公众号</a>
-    </p>
   </div>
 </template>
 
@@ -23,10 +15,14 @@ export default {
   watch: {
     $route: function (newv, oldv) {
       let catalog = this.$route.name
-      if (catalog === 'Add') {
+      if (catalog === 'AddEditor') {
         this.showFooter = false
       } else {
         this.showFooter = true
+      }
+      let path = this.$route.path
+      if (path.includes('/user')) {
+        this.showFooter = false
       }
     }
   }

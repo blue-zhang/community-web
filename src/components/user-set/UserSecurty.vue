@@ -17,27 +17,27 @@
               <p>{{item.title}}</p>
             </div>
           </td>
+
           <td>{{current[item.type] === true ? item.ok.title : item.notok.title}}</td>
+
+          <!-- query.name用于修改页面的导航；query.link显示在navigationBar中 -->
           <td v-if="item.type !== 'qq' && item.type !== 'weixin'">
-            <!-- query.name用于修改页面的导航；query.link显示在navigationBar中 -->
-            <router-link class="text-link pointer"
-                         :to="{ name: 'PwdVerify', query: {link: item.ok.link}}"
-                         @click.native="getType(item.ok.link, item.ok.name)"
-                         v-if="current[item.type] === true">{{item.ok.link}}</router-link>
-            <router-link class="text-link pointer"
-                         :to="{ name: 'PwdVerify', query: {link: item.ok.link} }"
-                         @click.native="getType(item.notok.link, item.notok.name)"
-                         v-else>{{item.notok.link}}</router-link>
+            <router-link v-if="current[item.type] === true"
+                         class="text-link pointer"
+                         :to="{ name: 'PwdVerify', query: {textName: item.ok.link, comName: item.ok.name}}">{{item.ok.link}}</router-link>
+            <router-link v-else
+                         class="text-link pointer"
+                         :to="{ name: 'PwdVerify', query: {textName: item.notok.link, comName: item.notok.name} }">{{item.notok.link}}</router-link>
           </td>
+
+          <!-- qq和微信，取消绑定直接弹出一个提示，就自动取消，不用向后面导航 -->
           <td v-else>
-            <!-- qq和微信，取消绑定直接弹出一个提示，就自动取消，不用向后面导航 -->
             <div class="text-link pointer"
                  v-if="current[item.type] === true"
                  @click="cancelBind(item.type)">{{item.ok.link}}</div>
             <router-link v-else
                          class="text-link pointer"
-                         :to="{ name: 'PwdVerify', query: {link: item.ok.link} }"
-                         @click.native="getType(item.notok.link, item.notok.name)">{{item.notok.link}}</router-link>
+                         :to="{ name: 'PwdVerify', query: {textName: item.notok.link, comName: item.notok.name} }">{{item.notok.link}}</router-link>
           </td>
         </tr>
       </tbody>
@@ -47,7 +47,7 @@
 
 <script>
 export default {
-  name: 'AccountBind',
+  name: 'UserSecurty',
   data () {
     return {
       current: {
@@ -57,6 +57,8 @@ export default {
         qq: false,
         weixin: false
       },
+      // link 是按钮和 ProgressBar 中显示的文字
+      // name 是进入修改页面后第二个组件的 name
       lists: [
         {
           type: 'password',
@@ -66,6 +68,7 @@ export default {
             link: '修改密码',
             name: 'PwdChange'
           },
+          // 修改密码功能，只有一种，不存在没有绑定密码的情况。
           notok: {
             title: '已设置密码',
             link: '修改密码',
@@ -135,12 +138,8 @@ export default {
       this.$alert('暂未开发')
     },
     getType (link, name) {
-      const barLists = this.$store.state.barLists
-      barLists[1].name = link
-      barLists[1].routerName = name
-      barLists[2].name = '修改成功'
-      barLists[2].routerName = 'ChangeSucc'
-      this.$store.commit('getBarLists', barLists)
+      this.$route.query.comName = name
+      this.$route.query.textName = link
     }
   }
 }
@@ -155,7 +154,6 @@ table {
     text-align: center;
     border-top: 1px solid #e5e9ef;
     td:first-child {
-      border-top: 1px solid #e5e9ef;
       display: flex;
       align-items: center;
       justify-content: center;

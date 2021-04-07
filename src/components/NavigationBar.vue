@@ -21,18 +21,8 @@ export default {
   name: 'NavigationBar',
   data () {
     return {
-      barName: ''
+      barName: this.$route.query.textName
     }
-  },
-  methods: {
-    naviHandler () {
-      this.barName = '忘记密码'
-    }
-  },
-  mounted () {
-    let barLists = JSON.parse(localStorage.getItem('barLists'))
-    // 以progressbar的第二步骤的名字作为导航栏最后一栏
-    this.barName = barLists[1].name
   }
 }
 </script>

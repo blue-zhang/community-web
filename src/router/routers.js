@@ -1,4 +1,13 @@
-import user from './modules/user'
+/*
+ * @Author: your name
+ * @Date: 2020-12-02 21:43:49
+ * @LastEditTime: 2021-03-03 16:18:38
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \front\src\router\routers.js
+ */
+import userCenter from './modules/userCenter'
+import userHome from './modules/userHome'
 import login from './modules/login'
 import account from './modules/account'
 import content from './modules/content'
@@ -14,16 +23,22 @@ export default {
   routes: [
     ...content,
     ...login,
-    ...user,
+    ...userCenter,
+    ...userHome,
     ...account,
     {
-      path: '/add',
-      component: Add,
       meta: { requireAuthorize: true },
+      path: '/user/add',
+      component: Add,
       children: [
         {
-          name: 'Add',
+          name: 'AddEditor',
           path: '',
+          component: AddEditor
+        },
+        {
+          name: 'PostUpdate',
+          path: '/update/:updatePid',
           component: AddEditor
         },
         {

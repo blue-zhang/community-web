@@ -1,4 +1,12 @@
-import { getList } from '@/api/content'
+/*
+ * @Author: your name
+ * @Date: 2020-10-27 10:42:16
+ * @LastEditTime: 2021-03-07 20:50:40
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \front\src\mixin\mixin-home.js
+ */
+import { getList, getListLogin } from '@/api/content'
 
 const mixinHome = {
   data () {
@@ -8,16 +16,16 @@ const mixinHome = {
       tag: '', // 精华
       sort: 'answer', // 按热度，按最新排序
       page: 0,
-      limit: 20,
+      limit: 15,
       // Panel组件控制catalog属性
       catalog: 'index',
       // 除了置顶栏目，别的栏目都显示不置顶的帖子
       isTop: '0',
-      lists: [],
-      // 判断是否最后一页
-      isLastPage: true,
-      // 判断是否重复请求
-      isWait: false
+      lists: []
+      // // 判断是否最后一页
+      // isLastPage: true,
+      // // 判断是否重复请求
+      // isWait: false
     }
   },
   methods: {
@@ -27,7 +35,7 @@ const mixinHome = {
       this.isLastPage = true
       this._getList()
     },
-    _getList () {
+    async _getList () {
       // 发送请求未响应，不能继续请求
       this.isWait = true
       let option = {
@@ -39,36 +47,33 @@ const mixinHome = {
         limit: this.limit,
         catalog: this.catalog
       }
-      getList(option).then(res => {
-        // 响应成功，可以继续请求
-        this.isWait = false
-        if (res.code === 200) {
-          // 判断是否为最后一页
-          if (res.data.length < this.limit) {
-            this.isLastPage = true
-          } else {
-            this.isLastPage = false
-          }
-          // 不一次性返回所有数据，每次翻页返回一次数据，利用concat拼接在一起
-          if (this.lists.length === 0) {
-            this.lists = res.data
-          } else {
-            this.lists = this.lists.concat(res.data)
-          }
+      let res
+      if (this.$store.state.token) {
+        res = await getListLogin(option)
+      } else {
+        res = await getList(option)
+      }
+      // 响应成功，可以继续请求
+      this.isWait = false
+      if (res.code === 200) {
+        // 判断是否为最后一页
+        if (res.data.length < this.limit) {
+          this.isLastPage = true
+        } else {
+          this.isLastPage = false
         }
-      })
-    },
-    nextPage () {
-      if (this.isLastPage) return
-      if (this.isWait) return
-      this.page++
-      this._getList()
+        // 不一次性返回所有数据，每次翻页返回一次数据，利用concat拼接在一起
+        if (this.lists.length === 0) {
+          this.lists = res.data
+        } else {
+          this.lists = this.lists.concat(res.data)
+        }
+      }
     }
   },
-  mounted () {
-    // 点击panel切换页面时，自动发送请求
+  async mounted () {
     this.catalog = this.$route.params.catalog ? this.$route.params.catalog : 'index'
-    this._getList()
+    await this._getList()
   }
 }
 

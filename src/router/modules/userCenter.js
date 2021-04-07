@@ -1,5 +1,4 @@
 const UserCenter = () => import(/* webpackChunkName: "UserCenter" */'@/views/UserCenter')
-const UserHome = () => import(/* webpackChunkName: "UserHome" */'@/views/user-center/UserHome')
 const UserIndex = () => import(/* webpackChunkName: "UserIndex" */'@/views/user-center/UserIndex')
 const HeadPic = () => import(/* webpackChunkName: "HeadPic" */'@/components/user-set/HeadPic.vue')
 const MyInfo = () => import(/* webpackChunkName: "MyInfo" */'@/components/user-set/MyInfo.vue')
@@ -7,13 +6,18 @@ const MyInfo = () => import(/* webpackChunkName: "MyInfo" */'@/components/user-s
 const UserSet = () => import(/* webpackChunkName: "UserSet" */'@/views/user-center/UserSet')
 const UserSecurty = () => import(/* webpackChunkName: "UserSecurty" */'@/components/user-set/UserSecurty')
 
-// 我的帖子
-const UserPost = () => import(/* webpackChunkName: "UserPost" */'@/views/user-center/UserPost')
-const MyPost = () => import(/* webpackChunkName: "MyPost" */'@/components/user-post/MyPost.vue')
-const PostCollection = () => import(/* webpackChunkName: "PostCollection" */'@/components/user-post/PostCollection.vue')
 const UserMessage = () => import(/* webpackChunkName: "UserMessage" */'@/views/user-center/UserMessage')
+const UserPraise = () => import(/* webpackChunkName: "UserPraise" */'@/views/user-center/UserPraise')
+const CommentPraise = () => import(/* webpackChunkName: "CommentPraise" */'@/components/user-message/CommentPraise')
+const PostPraise = () => import(/* webpackChunkName: "UserPraise" */'@/components/user-message/PostPraise')
+const ReplyMessage = () => import(/* webpackChunkName: "ReplyMessage" */'@/components/user-message/ReplyMessage')
+const PostComment = () => import(/* webpackChunkName: "UserMessage" */'@/components/user-message/PostComment')
 const UserOther = () => import(/* webpackChunkName: "UserOther" */'@/views/user-center/UserOther')
+const MyChat = () => import(/* webpackChunkName: "MyChat" */'@/views/user-center/MyChat.vue')
+const ChatMes = () => import(/* webpackChunkName: "ChatMes" */'@/views/user-center/ChatMes.vue')
+
 export default [
+  // 用户中心
   {
     path: '/user',
     component: UserCenter,
@@ -25,30 +29,35 @@ export default [
         name: 'UserIndex',
         component: UserIndex
       },
-      // 用户主页
       {
-        path: '/user/home',
-        name: 'UserHome',
-        component: UserHome
-      },
-      {
-        path: '/user/Message',
-        name: 'UserMessage',
-        component: UserMessage
-      },
-      {
-        path: '/user/post',
-        component: UserPost,
+        path: '/user/message',
+        component: UserMessage,
         children: [
           {
             path: '',
-            name: 'MyPost',
-            component: MyPost
+            name: 'UserMessage',
+            component: ReplyMessage
           },
           {
-            path: '/user/post/collection',
-            name: 'PostCollection',
-            component: PostCollection
+            path: '/user/message/comment',
+            name: 'PostComment',
+            component: PostComment
+          }
+        ]
+      },
+      {
+        path: '/user/praise',
+        component: UserPraise,
+        children: [
+          {
+            path: '',
+            name: 'PostPraise',
+            component: PostPraise
+          },
+          {
+            path: '/user/praise/comment',
+            name: 'CommentPraise',
+            component: CommentPraise
           }
         ]
       },
@@ -56,6 +65,16 @@ export default [
         path: '/user/other',
         name: 'UserOther',
         component: UserOther
+      },
+      {
+        path: '/user/myChat',
+        component: MyChat,
+        name: 'MyChat',
+        children: [{
+          name: 'ChatMes',
+          path: '/user/myChat/:receiver',
+          component: ChatMes
+        }]
       },
       {
         path: '/user/set',
@@ -81,4 +100,5 @@ export default [
       }
     ]
   }
+
 ]

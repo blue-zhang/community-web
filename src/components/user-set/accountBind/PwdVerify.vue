@@ -4,6 +4,7 @@
     <form class="layui-form layui-form-pane layui-show pd-tb15 flex-center-row"
           @submit.prevent="handleSubmit(onSubmit)">
       <div class="pwd-item"></div>
+
       <div class="pwd-item">
         <div class="layui-form-item flex-center-row">
           <validation-provider rules="required|minmax:6,16"
@@ -44,15 +45,11 @@
         </div>
       </div>
 
-      <div class="flex-start-col pwd-item pwd-item-other">
-        <div style="padding-left: 10px">
-          <router-link :to='{name: "Forget"}'>忘记密码</router-link>
-        </div>
-
-        <div style="padding-left: 10px">
-          <router-link :to='{name: "OtherVerify"}'>其他验证方式</router-link>
-        </div>
+      <div class="pwd-item pl-5">
+        <router-link class="pl-10"
+                     :to='{name: "OtherVerify", query: { comName: $route.query.comName, textName: $route.query.textName }}'>其他验证方式</router-link>
         <div class="svg-captcha layui-form-mid"
+             style="padding-left: -19px; margin-top: 35px"
              v-html="vali_svg"
              @click="_getCaptcha()"></div>
       </div>
@@ -76,10 +73,9 @@ export default {
       }).then(res => {
         if (res.code === 200) {
           this.$alert(res.msg)
-          // 跳转
-          const barLists = JSON.parse(localStorage.getItem('barLists'))
           this.$router.push({
-            name: barLists[1].routerName
+            name: this.$route.query.comName,
+            query: { comName: this.$route.query.comName, textName: this.$route.query.textName }
           })
         } else {
           this.$alert(res.msg)
@@ -88,13 +84,7 @@ export default {
     }
   },
   mounted () {
-    let barLists = JSON.parse(localStorage.getItem('barLists'))
-    barLists[1].name = this.$route.query.link ? this.$route.query.link : barLists[1].name
-    barLists[1].complete = false
-    barLists[2].complete = false
-    barLists[2].name = '修改成功'
-    barLists[0].complete = true
-    this.$store.commit('getBarLists', barLists)
+    this.event.$emit('progress', 0)
   }
 }
 </script>
@@ -112,9 +102,9 @@ export default {
 .pwd-item {
   width: 300px;
   height: 150px;
-}
-.pwd-item-other {
-  padding-left: 5px;
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
   .svg-captcha {
     margin-top: 18px;
   }

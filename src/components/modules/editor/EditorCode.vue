@@ -4,6 +4,7 @@
                 :title="'插入代码或文本'">
     <textarea v-model="code"
               name="desc"
+              class="editor-alert"
               ref="text"
               placeholder="请输入内容"
               :style="{width: codeWidth + 'px', height: codeHeight + 'px', minHeight: '150px', minWidth: '402px'}"></textarea>

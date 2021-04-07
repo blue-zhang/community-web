@@ -16,18 +16,6 @@ const getCaptcha = sid => {
     }
   })
 }
-// 用邮件或短信发送验证码
-const sendCode = option => {
-  return axios.post('/public/code', {
-    ...option
-  })
-}
-// 验证验证码
-const otherVerify = option => {
-  return axios.post('/public/verify', {
-    ...option
-  })
-}
 
 // 重置密码
 const reset = option => {
@@ -48,4 +36,4 @@ const register = option => {
     ...option
   })
 }
-export { getCaptcha, login, register, reset, sendCode, otherVerify }
+export { getCaptcha, login, register, reset }

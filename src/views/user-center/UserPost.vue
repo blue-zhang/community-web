@@ -1,20 +1,21 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-10-27 10:42:17
+ * @LastEditTime: 2021-03-07 10:33:21
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \front\src\views\user-center\UserPost.vue
+-->
 <template>
   <div class="fly-panel fly-panel-user"
        pad20>
-    <!--
-    <div class="fly-msg" style="margin-top: 15px;">
-      您的邮箱尚未验证，这比较影响您的帐号安全，<a href="activate.html">立即去激活？</a>
-    </div>
-    -->
-    <div class="layui-tab layui-tab-brief"
-         lay-filter="user">
-      <ul class="layui-tab-title"
-          id="LAY_mine">
+    <div class="layui-tab layui-tab-brief">
+      <ul class="layui-tab-title">
         <router-link tag="li"
                      v-for="(item, index) in postLists"
                      :key="'mypost'+index"
                      :to="{name: item.name}">
-          {{item.title}}（<span>{{item.num}}</span>）</router-link>
+          {{item.title}}</router-link>
       </ul>
       <div class="layui-tab-content"
            style="padding: 20px 0;">
@@ -27,18 +28,16 @@
 <script>
 export default {
   name: 'UserPost',
-  data() {
+  data () {
     return {
       postLists: [
         {
-          title: '我发的贴',
-          name: 'MyPost',
-          num: 96
+          title: '我的文章',
+          name: 'MyPost'
         },
         {
-          title: '收藏的贴',
-          name: 'PostCollection',
-          num: 12
+          title: '收藏夹',
+          name: 'PostCollection'
         }
       ]
     }

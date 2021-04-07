@@ -15,11 +15,41 @@
 </template>
 
 <script>
+
 export default {
   name: 'ProgressBar',
-  computed: {
-    barLists () {
-      return this.$store.state.barLists
+  data () {
+    return {
+      barLists: [
+        {
+          name: '用户验证',
+          complete: false,
+          routerName: 'PwdVerify'
+        },
+        {
+          name: '修改绑定邮箱',
+          complete: false,
+          routerName: ''
+        },
+        {
+          name: '修改成功',
+          complete: false,
+          routerName: ''
+        }
+      ]
+    }
+  },
+  watch: {
+    $route: function (n, o) {
+      this.event.$on('progress', this.handleProgress)
+    }
+  },
+  methods: {
+    handleProgress (val) {
+      this.barLists[1].name = this.$route.query.textName
+      for (let i = 0; i <= val; i++) {
+        this.barLists[i].complete = true
+      }
     }
   },
   props: {
@@ -27,6 +57,12 @@ export default {
       type: String,
       default: '#5FB878'
     }
+  },
+  mounted () {
+    this.event.$on('progress', this.handleProgress)
+  },
+  beforeDestroy () {
+    this.event.$off('progress', this.handleProgress)
   }
 }
 </script>

@@ -1,7 +1,6 @@
 <template>
   <div class="layui-layer layui-layer-tips layui-edit-face"
-       id="layui-layer1"
-       ref="face">
+       id="layui-layer1">
     <div class="layui-layer-content">
       <ul class="layui-clear">
         <li :title="key"

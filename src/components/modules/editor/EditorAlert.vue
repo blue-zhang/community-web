@@ -4,14 +4,13 @@
     <div class="editor-header">
       <div @mousedown="start"
            class="editor-header-left move">
-        <span class="editor-title">{{title || 123}}</span>
+        <span class="editor-title">{{title || 未正确传递标题}}</span>
       </div>
       <i class=" editor-close layui-icon layui-icon-close pointer"
          @click="close"></i>
     </div>
     <div class="editor-main">
       <slot>
-        <input type="text">
       </slot>
       <div class="editor-btn"
            v-show="showAddBtn">
@@ -60,11 +59,12 @@ export default {
       this.$emit('close')
     },
     start (e) {
-      // console.log('start -> e', e)
       if (this.isPre) {
         return
       }
       this.isMove = true
+      // offsetX 鼠标位置与元素内边距边框的距离（不包括边框）
+      // clientX 鼠标在客户区的坐标
       this.startx = e.clientX - e.offsetX
       this.starty = e.clientY - e.offsetY
       this.startClientx = e.clientX
@@ -73,20 +73,21 @@ export default {
       this.$refs.container.addEventListener('mouseup', this.stop)
     },
     move (e) {
-      // console.log('move -> e', e)
-      const container = this.$refs.container
       e.stopPropagation()
       if (this.isMove) {
-        container.style.left = this.startx + e.clientX - this.startClientx + 'px'
-        container.style.top = this.starty + e.clientY - this.startClienty + 'px'
+        this.$refs.container.style.left = this.startx + e.clientX - this.startClientx + 'px'
+        this.$refs.container.style.top = this.starty + e.clientY - this.startClienty + 'px'
       }
     },
     stop (e) {
-      // console.log('stop -> e', e)
       this.isMove = false
       this.$refs.container.removeEventListener('mousemove', this.move)
       this.$refs.container.removeEventListener('mouseup', this.stop)
     }
+  },
+  mounted () {
+    const doc = document.querySelector('.editor-alert')
+    if (doc) { doc.focus() }
   }
 }
 </script>
@@ -97,7 +98,7 @@ export default {
 }
 
 .editor-wrap {
-  z-index: 2;
+  z-index: 200;
   // 使用absolute有问题，因为absolute是相对于父元素的，多级嵌套之后，父元素就很难判断
   position: fixed;
   background-color: #fff;

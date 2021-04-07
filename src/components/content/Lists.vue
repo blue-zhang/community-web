@@ -1,8 +1,8 @@
 <template>
-  <div class="fly-panel"
+  <div class="fly-panel  lsCon"
        style="margin-bottom: 0">
     <div class="fly-panel-title fly-filter">
-      <a href=""
+      <!-- <a href=""
          :class="{ 'layui-this': isEnd === '' && tag === '' }"
          @click.prevent="search(0)">综合</a>
       <span class="fly-mid"></span>
@@ -16,7 +16,7 @@
       <span class="fly-mid"></span>
       <a href=""
          :class="{ 'layui-this': tag === '精华' }"
-         @click.prevent="search(3)">精华</a>
+         @click.prevent="search(3)">精华</a> -->
       <span class="fly-filter-right layui-hide-xs">
         <a href=""
            :class="{ 'layui-this': sort === 'created' }"
@@ -28,7 +28,8 @@
       </span>
     </div>
     <lists-item :lists="lists"
-                @nextPage="nextPage()"
+                @change-col="changeCol"
+                @change-praise="changePraise"
                 :isLastPage="isLastPage">
     </lists-item>
   </div>
@@ -36,22 +37,22 @@
 <script>
 import ListsItem from '@/components/content/ListsItem'
 import mixinHome from '@/mixin/mixin-home'
+import mixinLoad from '@/mixin/mixin-load'
 
 export default {
   name: 'Lists',
   components: {
     ListsItem
   },
-  mixins: [mixinHome],
-  data() {
+  mixins: [mixinHome, mixinLoad],
+  data () {
     return {
-      // 防止点击菜单多次发送请求
       current: 0,
       isEnd: '',
       tag: '',
       sort: 'answer',
       page: 0,
-      limit: 20,
+      limit: 15,
       catalog: 'index',
       isTop: '0'
     }
@@ -60,7 +61,7 @@ export default {
     current (newv, oldv) {
       this.init()
     },
-    '$route' (newv, oldv) {
+    $route (newv, oldv) {
       let catalog = this.$route.params.catalog
       if (typeof catalog !== 'undefined' && catalog !== '') {
         this.catalog = catalog
@@ -69,6 +70,17 @@ export default {
     }
   },
   methods: {
+    // 收藏信息前端伪同步，父子组件传值
+    changeCol (index, val, num) {
+      console.log(num)
+      this.lists[index].collected = val
+      this.lists[index].stars = num
+    },
+    // 点赞信息前端伪同步，父子组件传值
+    changePraise (index, val, num) {
+      this.lists[index].handed = val
+      this.lists[index].hands = num
+    },
     search (val) {
       /**
        * @: 防止重复请求

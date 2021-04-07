@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="minWidth: 700px;maxWidth: 700px">
     <p class="adding-tag">{{saveAlert}}</p>
     <div class="layui-form layui-tab-content"
          style="padding: 20px 0;">
@@ -7,13 +7,12 @@
         <form>
           <div class="layui-row layui-form-item pic-container"
                ref="wrapContainer">
-            <div v-if="!picUrl"
+            <div v-show="!post.picUrl"
                  class="pic-area pointer"
-                 @click="uploadPic"
+                 @click="$refs.file.click()"
                  @mouseover="showText = true"
                  @mouseout="showText = false"
-                 ref="container"
-                 :style="{ paddingBottom: `${countH}`, background: `#f6f6f6 url(${picUrl}) left top no-repeat`, backgroundSize: `${containerW}px ${countH}`}">
+                 :style="{ paddingBottom: `${countH}px`, background: `#f6f6f6`}">
               <div class=" pic-icon flex-start-col"><i class="layui-icon layui-icon-camera"></i>
                 <transition name="opacity">
                   <span v-show="showText">点击上传图片</span>
@@ -25,14 +24,13 @@
                      @change="changePic"
                      accept="image/png, image/jpg, image/gif"
                      style="display: none">
-              <img :src="imgUrl ? imgUrl : 'http://localhost:3000/img/logo.png'"
-                   ref="pic"
-                   style="display: none">
             </div>
-            <div v-else
+            <div v-show="post.picUrl"
                  class="pic-area"
-                 :style="{ paddingBottom: `${countH}`, background: `#f6f6f6 url(${picUrl}) left top no-repeat`, backgroundSize: `${containerW}px ${countH}`}">
+                 id="AddImgCon"
+                 :style="{ paddingBottom: `${countH}px`}">
               <div @click.stop="deletePic"
+                   id="AddDel"
                    class=" pic-icon del-icon flex-start-col pointer"
                    title="删除图片">
                 <i class="layui-icon layui-icon-delete "></i>
@@ -41,13 +39,12 @@
             <textarea type="text"
                       maxlength="40"
                       ref="titleTextarea"
-                      name="title"
-                      :value="title"
+                      :value="post.title"
                       @input="changeTitle"
                       placeholder="请输入标题[最多40字符]"
                       class="fly-editor title-area" />
           </div>
-          <editor>
+          <editor :update='update'>
           </editor>
         </form>
       </div>
@@ -59,16 +56,17 @@
 <script>
 import config from '@/config/config'
 import { uploadImg } from '@/api/user'
-import { saveDrafts, getDrafts, updateDrafts } from '@/api/content'
+import { saveDrafts, updateDrafts, updatePost, loadUpdate } from '@/api/content'
+import Editor from '@/components/modules/editor/Editor'
+import selectionToEnd from '@/utils/contenteditable/selectToEnd'
 // import _ from 'lodash'
 export default {
-  name: 'Add',
+  name: 'AddEditor',
   components: {
-    Editor: () => import('@/components/modules/editor/Editor')
+    Editor
   },
   data () {
     return {
-      post: this.$store.state.post,
       // 控制图片图标下文字的显示
       showText: false,
       // 显示正在保存还是已自动保存
@@ -77,54 +75,48 @@ export default {
       adding: false,
       // 正在自动保存的提示语
       saveAlert: '',
-      picUrl: '',
       // 用来保存setTimeOut
       time: 0,
-      // 图片原始高宽比
+      // 图片原始高宽比，计算后的图片宽高
       radio: 0.4,
-      // 图片高度通过计算得到
       countH: '',
-      containerW: ''
+      temPath: '', // 记录图片的路径
+      update: false // 判断是否是在更新已存在的帖子
     }
   },
   computed: {
-    title () {
-      return this.$store.state.post.title
-    },
-    imgUrl () {
-      return this.$store.state.post.picUrl
+    post: function () {
+      return this.$store.state.post
     }
   },
   watch: {
-    imgUrl (n, o) {
-      this.adding = true
-      // imageUrl改变时，给picUrl赋值，计算高宽比
-      setTimeout(async () => {
-        if (n !== '') {
-          await this.countSize()
-        }
-      }, 500)
-    },
-    // 通过监听vuex中的post对象的变化，来决定是否发送请求
-    post: {
-      handler (n, o) {
-        this.adding = true
-        if (this.time) {
-          clearTimeout(this.time)
-        }
-        this.time = setTimeout(() => {
-          this.time = 0
-          this.addContent()
-          this.adding = false
-        }, 1000)
-      },
-      deep: true
-    },
     adding (n, o) {
       this.saveAlert = n ? '正在自动保存' : '已保存到草稿箱'
     }
   },
   methods: {
+    // 文章内容变化的时候，watch 的回调
+    handleWatch (n, o) {
+      this.adding = true
+      if (this.time) {
+        clearTimeout(this.time)
+      }
+      if (!this.$route.params.updatePid) {
+        // 更新草稿箱
+        this.time = setTimeout(() => {
+          this.time = 0
+          this.updateDrafts(this.post)
+          this.adding = false
+        }, 500)
+      } else {
+        // 更新已发表的文章
+        this.time = setTimeout(() => {
+          this.time = 0
+          this.updatePost(this.post)
+          this.adding = false
+        }, 500)
+      }
+    },
     changePic (e) {
       let file = e.target.files
       let formData = new FormData()
@@ -132,130 +124,144 @@ export default {
         formData.append('file', file[0])
       }
       this.formData = formData
-      uploadImg(this.formData).then(res => {
+      uploadImg(this.formData, 'postPic', this.post.pid).then(res => {
         if (res.code === 200) {
           const baseUrl =
             process.env.NODE_ENV === 'production'
               ? config.baseUrl.pro
               : config.baseUrl.dev
-          this.post.picUrl = baseUrl + res.path
+          this.temPath = baseUrl + res.path
         }
       })
-    },
-    uploadPic () {
-      this.$refs.file.click()
+      setTimeout(() => {
+        this.$store.commit('setPostPic', this.temPath)
+        this.countSize()
+      }, 500)
     },
     // 宽度为容器宽度，宽高比为图片宽高比
     countSize () {
-      // 获取图片高宽比
-      if (!this.$refs.pic) {
-        // created钩子中，vuex的值可能会发生改变触发这个函数，页面没有渲染，要直接返回
-        return
+      const img = new Image()
+      img.src = this.post.picUrl
+      img.onload = () => {
+        img.id = 'AddImg'
+        this.radio = img.naturalHeight / img.naturalWidth
+        // 在获得高宽比之后，为图片设置初始高宽
+        img.width = this.$refs.wrapContainer.offsetWidth
+        this.countH = img.width * this.radio
+        img.height = this.countH
+        document.getElementById('AddImgCon').insertBefore(img, document.getElementById('AddDel'))
+        window.addEventListener('resize', this.resizeHandler)
       }
-      let width = this.$refs.pic.naturalWidth
-      let height = this.$refs.pic.naturalHeight
-      this.radio = height / width
-      // 在获得高宽比之后，为图片设置初始高宽
-      this.containerW = this.$refs.container.offsetWidth
-      this.countH = `${parseInt(this.containerW * this.radio)}px`
-      this.picUrl = this.imgUrl
-      window.addEventListener('resize', this.resizeHandler)
+      img.onerror = function () {
+      }
     },
     resizeHandler () {
+      // 有莫名其妙的错误
+      const img = document.getElementById('AddImg')
       try {
-        this.containerW = this.$refs.wrapContainer.offsetWidth
+        img.width = this.$refs.wrapContainer.offsetWidth
       } catch (error) {
       }
-      this.countH = `${parseInt(this.containerW * this.radio)}px`
+      this.countH = img.width * this.radio
+      img.height = this.countH
     },
     // 删除图片
     deletePic () {
-      this.$store.state.post.picUrl = ''
-      this.picUrl = ''
+      this.$store.commit('setPostPic', '')
       // 必须一样，前面设置了debounce，这里也要用debounce
       window.removeEventListener('resize', this.resizeHandler)
-      this.countH = '30%'
+      document.getElementById('AddImgCon').removeChild(document.getElementById('AddImg'))
+      this.countH = 250
     },
     // 把title改变的值储存在store中
     changeTitle (e) {
-      Object.assign(this.post, {
-        title: e.target.value
-      })
+      this.$store.commit('setPost', { ...this.post, title: e.target.value })
     },
-    // 编辑内容改变时触发的回调
-    addContent () {
-      if (this.$store.state.created) {
-        this.updateDrafts({ ...this.post, created: this.$store.state.created })
-      } else {
-        this.saveDrafts(this.post)
-      }
-    },
-    // 更新草稿，如果草稿箱被删除，则保存一个新的草稿
+    // 更新已有草稿
     updateDrafts (data) {
-      console.log('更新')
       updateDrafts(data).then(res => {
         this.adding = false
-        this.$store.commit('getCreated', res.created)
-        if (res.code === 401) {
+        // 编辑过程中，如果原来的草稿箱被删除，则调用saveDrafts创保一个新的草稿
+        if (res.code === 410) {
           this.saveDrafts(data)
         }
       })
     },
-    // 保存新草稿
+    // 创建新草稿, 返回 pid
     saveDrafts (data) {
-      console.log('保存')
       saveDrafts(data).then(res => {
         if (res.code === 200) {
           this.adding = false
-          this.$store.commit('getCreated', res.created)
+          this.$store.commit('setPostPid', res.pid)
         }
       })
     },
-    submitPost () {
-
+    // 更新已有文章
+    updatePost (data) {
+      updatePost(data).then(res => {
+        this.adding = false
+      })
     }
   },
   async mounted () {
-    /**
-     * 保险措施，无论图片是否变化，都要执行，不然会不显示图片
-     */
-    if (this.$route.params.type) {
-      const res = await getDrafts(this.$route.params.type)
+    if (this.$route.params.updatePid) {
+      // 更新已发布的帖子
+      this.update = true
+      // post 是发表的文章的内容，如果不是第一次更新，不能使用 post
+      const { updatePid, post } = this.$route.params
+      const res = await loadUpdate(updatePid)
       if (res.code === 200) {
-        Object.assign(this.post, {
-          picUrl: res.data.picUrl,
+        // 帖子更新没发表，下次更新的时候，从后端获取数据
+        this.$store.commit('setPost', {
+          content: res.data.content,
           title: res.data.title,
-          content: res.data.content
+          picUrl: res.data.picUrl,
+          pid: res.data.pid
         })
-        this.$store.commit('getCreated', res.data.created)
+      } else if (updatePid && post) {
+        // 第 1 次更新帖子
+        this.$store.commit('setPost', {
+          content: post.content,
+          title: post.title,
+          picUrl: post.picUrl,
+          pid: updatePid
+        })
+      } else {
+        // 第 1 次更新帖子时刷新他妈的页面时！
+        // 刷新之后，动态路由参数存在，post不存在
+        let temPost = localStorage.getItem('temPost')
+        this.$store.commit('setPost', JSON.parse(temPost))
+      }
+    } else {
+      // 编辑帖子
+      let temPost = localStorage.getItem('temPost')
+      if (JSON.parse(temPost)) {
+        this.$store.commit('setPost', JSON.parse(temPost))
+      } else {
+        this.$store.commit('setPost', {
+          content: '',
+          title: '',
+          picUrl: '',
+          pid: ''
+        })
       }
     }
+
+    document.querySelector('#editorArea').innerHTML = this.$store.state.post.content
+    selectionToEnd('#editorArea')
+
     await this.$nextTick()
-    console.log('判断前', this.post.picUrl)
-    if (this.post.picUrl !== '') {
-      console.log('判断后', this.post.picUrl)
-      setTimeout(async () => {
-        await this.countSize()
-      }, 200)
+    if (this.$store.state.post.picUrl !== '') {
+      this.countSize()
     }
-    this.$refs.titleTextarea.focus()
+    this.$watch('post.content', this.handleWatch)
+    this.$watch('post.title', this.handleWatch)
+    this.$watch('post.picUrl', this.handleWatch)
+
     this.$store.state.showFooter = false
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
-  },
-  beforeRouteLeave (to, from, next) {
-    if (to.name === 'AddDrafts') {
-      next()
-    } else {
-      this.$store.commit('getCreated', '')
-      this.$store.commit('getPost', {
-        content: '',
-        title: '',
-        picUrl: ''
-      })
-      next()
-    }
   }
 }
 </script>
@@ -280,7 +286,7 @@ export default {
     width: 100%;
     height: 0;
     overflow: hidden;
-    padding-bottom: 30%;
+    padding-bottom: 250px;
   }
   .pic-icon {
     height: 100px;
@@ -321,8 +327,8 @@ export default {
   z-index: 2000000;
   position: fixed;
   font-weight: bold;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
-    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   top: 100px;
   left: 1%;
   color: rgba($color: #000000, $alpha: 0.5);

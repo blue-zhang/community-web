@@ -19,18 +19,65 @@ export default {
 </script>
 
 <style lang="scss" >
-@import '../public/static/css/global.css';
-// 使用彩色iconfont需要进行设置
+@import "../public/static/css/global.css";
+
 html body {
   box-sizing: border-box;
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    // background: -webkit-gradient(
+    //   linear,
+    //   left top,
+    //   left bottom,
+    //   from(#ff8a00),
+    //   to(#e52e71)
+    // );
+    // background: linear-gradient(180deg, #ff8a00, #e52e71);
+    background: #c2c2c2;
+    border-radius: 30px;
+    // box-shadow: inset 2px 2px 2px hsla(0, 0%, 100%, 0.25),
+    //   inset -2px -2px 2px rgba(0, 0, 0, 0.25);
+  }
+  &::-webkit-scrollbar-track {
+    // background: linear-gradient(
+    //   90deg,
+    //   #201c29,
+    //   #201c29 1px,
+    //   #100e17 0,
+    //   #100e17
+    // );
+    background: #dddddd;
+  }
 }
-
+#loadBottom {
+  position: absolute;
+  bottom: 0;
+}
+// 使用彩色iconfont的设置
 .icon {
   width: 1em;
   height: 1em;
   vertical-align: -0.15em;
   fill: currentColor;
   overflow: hidden;
+}
+.blink {
+  cursor: pointer;
+  color: #393d49;
+  &:hover {
+    color: #1e9fff;
+  }
+}
+.font16 {
+  font-size: 16px;
+}
+.link-hover {
+  &:hover {
+    color: #1e9fff;
+  }
 }
 // 验证码的样式
 .svg-captcha {
@@ -66,8 +113,14 @@ html body {
   top: 0;
   left: 0;
 }
+.vip-color {
+  color: #e6242b;
+}
 .co-origin {
   color: #ff5722;
+}
+.co-white {
+  color: white;
 }
 .co-blue {
   color: #00a1d6;
@@ -86,6 +139,16 @@ html body {
 }
 .bg-gray-low {
   background: #e2e2e2;
+}
+.hover_red {
+  &:hover {
+    color: #ff5722;
+  }
+}
+.hover_blue {
+  &:hover {
+    color: #01aaed;
+  }
 }
 .add-co {
   color: #999999;
@@ -125,6 +188,12 @@ html body {
 .mga {
   margin: 0 auto;
 }
+.pl-5 {
+  padding-left: 5px;
+}
+.pl-10 {
+  padding-left: 10px;
+}
 .pd-tb5 {
   padding-bottom: 5px;
   padding-top: 5px;
@@ -144,6 +213,18 @@ html body {
 }
 .fr {
   float: right;
+}
+.wrapContent {
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.ellip {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.userPic {
+  border-radius: 50%;
 }
 .text-center {
   text-align: center;
@@ -199,6 +280,49 @@ html body {
   align-items: center !important;
   flex-flow: column nowrap !important;
 }
+.middle-container1 {
+  display: flex;
+  .seat {
+    flex: 3;
+  }
+  .mainContainer {
+    flex: 9;
+  }
+}
+.middle-container2 {
+  width: 100vw;
+  display: flex;
+  .seat {
+    flex: 1;
+  }
+  .mainContainer {
+    flex: 8;
+  }
+  .rightContainer {
+    flex: 2;
+  }
+}
+@media screen and (max-width: 950px) {
+  .middle-container2 {
+    // 左右设置两个 seat
+    .seat {
+      flex: 0;
+    }
+    .rightContainer {
+      display: none;
+    }
+    .mainContainer {
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+    }
+  }
+  .middle-container1 {
+    .seat {
+      flex: 0;
+    }
+  }
+}
 .ft12 {
   font-size: 12px;
 }
@@ -236,6 +360,9 @@ $btn-cancel: #ededed;
   justify-content: center;
   align-items: center;
 }
+.shadowBox {
+  box-shadow: 5px 5px 5px #888888;
+}
 .alert-btn {
   width: 105px;
   height: 32px;
@@ -255,6 +382,22 @@ $btn-cancel: #ededed;
     }
   }
 }
+.css-ybodb {
+  box-sizing: border-box;
+  margin: 0px;
+  min-width: 0px;
+  color: rgb(255, 255, 255);
+  background-color: rgb(241, 64, 60);
+  padding-left: 4px;
+  padding-right: 4px;
+  position: absolute;
+  font-size: 11px;
+  border-radius: 20px;
+  height: 22px;
+  width: 22px;
+  line-height: 22px;
+  text-align: center;
+}
 .alert-btn-around {
   display: flex;
   flex-flow: row nowrap;
@@ -263,18 +406,85 @@ $btn-cancel: #ededed;
   width: 100%;
   padding: 0 10px;
 }
-
+.input-group {
+  height: 34px;
+  line-height: 34px;
+  border: 1px solid #009688;
+  border-radius: 4px;
+  position: relative;
+  input {
+    border: none;
+    font-size: 12px;
+    width: 200px;
+    margin-left: 10px;
+    padding: 0;
+    box-shadow: none;
+  }
+  .submit {
+    float: right;
+    height: 32px;
+    width: 60px;
+    background: #d9f1f9;
+    border: none;
+    border-left: 1px solid #009688;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+    color: #009688;
+    cursor: pointer;
+  }
+}
 .scale-leave-active {
   transition: transform 0.3s, opacity 0.2s;
 }
 .scale-enter-active {
   transition: transform 0.3s;
 }
-.scale-enter /* .fade-leave-active below version 2.1.8 */ {
+.scale-enter {
   transform: scale(0.3);
 }
 .scale-leave-to {
   transform: translateY(-60px);
   opacity: 0;
+}
+
+.top-enter-active,
+.top-leave-active {
+  transition: top 0.3s;
+}
+.top-enter,
+.top-leave-to {
+  top: -60px;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes bounceOut {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+.fade-leave-active {
+  animation: bounceOut 0.3s;
+}
+
+.fade-enter-active,
+.fade-enter-to {
+  animation: bounceIn 0.3s;
 }
 </style>

@@ -18,28 +18,30 @@
          class="fly-link"
          id="LAY_signinHelp"
          @click="show()">说明</a>
-      <i class="fly-mid"></i>
+      <!-- <i class="fly-mid"></i>
       <a href="javascript:;"
          class="fly-link"
          id="LAY_signinTop"
-         @click="showList()">活跃榜<span class="layui-badge-dot"></span></a>
+         @click="showList()">活跃榜<span class="layui-badge-dot"></span></a> -->
       <span class="fly-signin-days"
-            style="color: #333333">已连续签到<cite>{{ count }}</cite>天</span>
+            style="color: #333333">已连续签到<cite>{{ $store.state.userInfo.count }}</cite>天</span>
     </div>
     <div v-show="isLogin"
          class="fly-panel-main fly-signin-main">
-      <button class="layui-btn layui-btn-danger"
+      <button type="button"
+              class="layui-btn layui-btn-danger"
               id="LAY_signin"
               @click="sign()"
               v-if="!isSign">
         今日签到
       </button>
-      <button class="layui-btn layui-btn-disabled"
+      <button type="button"
+              class="layui-btn layui-btn-disabled"
               v-else>
         签到倒计时{{countTime}}
       </button>
-      <span v-if="!isSign">今日可获得<cite>{{fav}}</cite>积分</span>
-      <span v-else>明日可获得<cite>{{fav}}</cite>积分</span>
+      <span v-if="!isSign">今日可获得<cite>{{favs}}</cite>积分</span>
+      <span v-else>明日可获得<cite>{{favs}}</cite>积分</span>
     </div>
     <div v-show="isShow">
       <div class="mask"
@@ -143,6 +145,7 @@ export default {
   name: 'Sign',
   data () {
     return {
+      isSign: false,
       isShow: false,
       isShowList: false,
       countTime: '',
@@ -176,16 +179,13 @@ export default {
     }
   },
   computed: {
-    count() {
-      return this.$store.state.userInfo.count
-    },
-    isLogin() {
+    isLogin () {
       return this.$store.state.isLogin
     },
-    fav() {
-      // 没签到，获得上一次count+1，计算本次可得积分
-      // 签到，获得这一次count+1，计算下次可得积分
-      let count = this.count + 1
+    favs () {
+      // 没签到，获得上一次count+1，计算本次签到可得积分
+      // 签到，获得这一次count+1，计算下次签到可得积分
+      let count = this.$store.state.userInfo.count + 1
       let thatFav = 5
       if (count <= 15 && count > 5) {
         thatFav = 10
@@ -199,9 +199,6 @@ export default {
         thatFav = 45
       }
       return thatFav
-    },
-    isSign() {
-      return this.$store.state.userInfo.isSign ? this.$store.state.userInfo.isSign : false
     }
   },
   methods: {
@@ -217,47 +214,42 @@ export default {
     closeList () {
       this.isShowList = false
     },
-    sort(val) {
+    sort (val) {
       this.type = val
     },
     countDown,
-    sign() {
+    sign () {
       getSign().then(res => {
         // 计算下次签到可得积分
+        // isSign 不存在于数据库中，只有前端存储
         let userInfo = this.$store.state.userInfo
-        userInfo.favs = res.favs
         userInfo.count = res.count
-        userInfo.fav = res.fav
+        userInfo.favs = res.favs
         userInfo.lastSign = res.created
-        userInfo.isSign = true
+        this.isSign = true
+        this.$store.commit('setUserInfo', userInfo)
+        this.$store.commit('setSign', true)
         // 签到成功，开始倒计时
         this.countDown(() => {
-          let userInfo = this.$store.state.userInfo
-          userInfo.isSign = false
-          this.$store.commit('getUserInfo', userInfo)
+          this.$store.commit('setSign', false)
+          this.isSign = false
         })
-        this.$store.commit('getUserInfo', userInfo)
       })
     }
   },
-  mounted() {
-    // 页面刷新会清空vuex，且mounted先于beforeEach执行，即vuex还没有获得localStorage的数据.所以此时userInfo中没有数据，执行commit后，userinfo中只有isSign属性，进而导致localStorage的userInfo只有isSign属性，导致显示错误。
-    // let userInfo = this.$store.state.userInfo
-    let userInfo = JSON.parse(localStorage.getItem('userInfo'))
-    // 没有登录时，localStorage中没有数据
-    const isLogin = this.$store.state.isLogin
-    if (isLogin) {
-      if (moment(userInfo.lastSign).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
-        userInfo.isSign = true
+  mounted () {
+    let userInfo = this.$store.state.userInfo
+    if (this.isLogin) {
+      if (moment(userInfo.lastSign ? userInfo.lastSign : 0).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
+        this.isSign = true
         this.countDown(() => {
-          let userInfo = this.$store.state.userInfo
-          userInfo.isSign = false
-          this.$store.commit('getUserInfo', userInfo)
+          this.$store.commit('setSign', false)
+          this.isSign = false
         })
       } else {
-        userInfo.isSign = false
+        this.$store.commit('setSign', false)
+        this.isSign = false
       }
-      this.$store.commit('getUserInfo', userInfo)
     }
   }
 }

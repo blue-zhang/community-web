@@ -1,18 +1,18 @@
 <template>
   <div>
-    <top></top>
+    <!-- <top></top> -->
     <lists></lists>
   </div>
 </template>
 <script>
 import Lists from '../../components/content/Lists.vue'
-import Top from '../../components/content/Top.vue'
+// import Top from '../../components/content/Top.vue'
 
 export default {
   name: 'HomeIndex',
   components: {
-    Lists,
-    Top
+    Lists
+    // Top
   }
 }
 </script>

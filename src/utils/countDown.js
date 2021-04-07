@@ -3,11 +3,12 @@ import moment from 'dayjs'
 /**
  * 需要在data中设置一个countTime属性
  * 指定一个结束时间点进行倒计时，作为一个方法，添加到method中
+ * format('YYYY-MM-DD')把时间定格在0点
  * @param {String} type 是否取消定时
  * @param {*} callback 倒计时stop后的回调
  * @param {moment} end 几点钟结束计时，默认是明天0点
  */
-function countDown (callback = () => { }, type = '', end = moment().add(1, 'd').format('YYYY-MM-DD')) {
+function countDown (callback = () => { }, end = moment().add(1, 'd').format('YYYY-MM-DD')) {
   let count = () => {
     const now = moment(moment().format('YYYY-MM-DD HH:mm:ss')).unix() * 1000
     const endTime = moment(end).unix() * 1000
@@ -23,9 +24,25 @@ function countDown (callback = () => { }, type = '', end = moment().add(1, 'd').
   function stop () {
     clearInterval(myCount)
   }
-  if (type === 'cancel') {
+}
+
+function durtionCountDown (time, cb, nowStop) {
+  if (nowStop) {
     stop()
-    callback()
+  }
+  let count = () => {
+    this.durtionCountTime = time
+    // console.log(this.durtionCountTime)
+    time--
+    localStorage.setItem('countTime', this.durtionCountSecond)
+    if (time === 0) {
+      stop()
+      cb()
+    }
+  }
+  const myCount = setInterval(count, 1000)
+  function stop () {
+    clearInterval(myCount)
   }
 }
 
@@ -38,7 +55,7 @@ function countDown (callback = () => { }, type = '', end = moment().add(1, 'd').
  * @param {*} callback 倒计时stop后的回调
  * @param {*} callback2 每次计时时的回调
  */
-function durtionCountDown (timeValue, type = 's', callback = () => { }) {
+function cplDurtionCountDown (timeValue, type = 's', callback = () => { }) {
   // 使用正则表达式来拆分时间值和单位
   let value = Number(timeValue.replace(/\D/, ''))
   let unit = timeValue.replace(/[0-9]*/, '').toLowerCase()
@@ -88,4 +105,5 @@ function durtionCountDown (timeValue, type = 's', callback = () => { }) {
     clearInterval(myCount)
   }
 }
-export { countDown, durtionCountDown }
+
+export { countDown, durtionCountDown, cplDurtionCountDown }

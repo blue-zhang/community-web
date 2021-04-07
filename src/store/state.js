@@ -1,64 +1,38 @@
 export default {
+  // 是否显示 Footer 组件
   showFooter: true,
+  // 图像验证码的 sid
   sid: '',
+  // 用户基本信息
   userInfo: {},
+  // 是否登录
   isLogin: false,
+  // token
   token: '',
+  // refreshToken
   refreshToken: '',
-  // 编辑页面，disable下一步按钮
-  cannotSubmit: false,
-  // 当前所使用的草稿箱
+  // 当前AddEditor路由下的编辑内容
   post: {
     content: '',
     title: '',
-    picUrl: ''
+    picUrl: '',
+    pid: ''
   },
-  created: '',
-  centerLists: [
-    {
-      title: '我的主页',
-      name: 'UserHome',
-      class: 'home-ul'
-    },
-    {
-      title: '用户中心',
-      name: 'UserIndex'
-    },
-    {
-      title: '基本设置',
-      name: 'MyInfo',
-      activeClass: 'layui-this'
-    },
-    {
-      title: '我的帖子',
-      name: 'MyPost',
-      activeClass: 'layui-this'
-    },
-    {
-      title: '我的消息',
-      name: 'UserMessage'
-    },
-    {
-      title: '其他设置',
-      name: 'UserOther'
-    }
-  ],
-  // ProgressBar的信息
-  barLists: [
-    {
-      name: '用户验证',
-      complete: false,
-      routerName: 'PwdVerify'
-    },
-    {
-      name: '修改绑定邮箱',
-      complete: false,
-      routerName: ''
-    },
-    {
-      name: '修改成功',
-      complete: false,
-      routerName: ''
-    }
-  ]
+  comments: '',
+  msg: '',
+  // 该用户客户端 ws 对象
+  ws: null,
+  // 消息未读数
+  unreadNum: {
+    postHand: 0,
+    comHand: 0,
+    postCom: 0,
+    comReply: 0
+  },
+  // 私信未读数
+  chatNum: 0,
+  chatMes: [],
+  // 和某个人具体的对话消息
+  mesLs: [],
+  receiver: ''
 }
